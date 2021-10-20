@@ -131,3 +131,4 @@ dmypy.json
 # SELF
 data
 models
+.idea
