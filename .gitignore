@@ -134,3 +134,5 @@ models
 .idea
 var
 .vscode
+.venv
+venv
