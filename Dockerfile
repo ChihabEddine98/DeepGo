@@ -1,5 +1,4 @@
-FROM python:3.8-slim
-FROM tensorflow/tensorflow
+FROM tensorflow/tensorflow as dev
 
 COPY ./src  ./app/src
 COPY ./utils ./app/utils

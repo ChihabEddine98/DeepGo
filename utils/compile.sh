@@ -1,1 +1,1 @@
-c++ -O3 -Wall -shared -std=c++11 -fPIC `python3 -m pybind11 --includes` ../src/golois.cpp -o golois`python3-config --extension-suffix` -I /usr/include/python3.7m/
+c++ -O3 -Wall -shared -std=c++11 -fsized-deallocation -fPIC `python3 -m pybind11 --includes` /app/src/golois.cpp -o golois
