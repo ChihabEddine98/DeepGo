@@ -130,7 +130,6 @@ dmypy.json
 
 # SELF
 data
-models
 .idea
 var
 .vscode
