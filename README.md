@@ -10,5 +10,11 @@ Now you need to run this container :
 
 
 # TODO
-MobileNet + ShuffleNet archs
+
+- [x] Create Generic Model
+- [x]  DGV0 -- ReLU/swish activation
+- [ ] try out e-swish : [here](https://arxiv.org/pdf/1801.07145.pdf)
+- [ ] try h-swish [here](https://paperswithcode.com/method/hard-swish)
+
+
 
