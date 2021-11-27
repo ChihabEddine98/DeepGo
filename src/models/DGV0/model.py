@@ -38,7 +38,7 @@ class DGM(object):
     def __str__(self) -> str:
         return f'DGMV{self.version}'
 
-    def plot_model(self,save_path='model_imgs'):
+    def plot_model(self,save_path='models/model_imgs'):
         
         if not self.model:
             print(f' You should build the model first !')
