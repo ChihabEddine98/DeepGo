@@ -27,31 +27,40 @@ int * indexValidation;
 bool * validationGame;
 int * nbTimesGameIsUsed;
 
+int * numberGame, * numberMove;
+
+float soft = 1.0;
+
 static Board b;
 
+void setSoft (float s) {
+  soft = s;
+}
+
 PYBIND11_MODULE(golois, m) {
+  m.def("setSoft", &setSoft, "setSoft");
   m.def("getBatch", [](py::array_t<float> x, py::array_t<float> policy,
-		       py::array_t<float> value, py::array_t<float> end, py::array_t<float> groups) {
+		       py::array_t<float> value, py::array_t<float> end, py::array_t<float> groups, int index) {
 	nbCallsGetBatch++;
-	if (!loaded) {
-	  memcpy (historyBoard [0], board.board, MaxSize);
-	  init_all_moves ();
-	  int seed = time (NULL);
-	  srand (seed); // if we run again the same model examples should be different
-          fprintf (stderr, "load games.data, seed = %d, RAND_MAX = %d, rand () = %d\n", seed, RAND_MAX, rand ());
-	  loadGamesData ("games.data");
-          fprintf (stderr, "MaxGroups = %d\n", MaxGroups);
-	  loaded = true;
-	  indexValidation = new int [nbExamples];
-	  validationGame = new bool [MaxGames];
-	  nbTimesGameIsUsed = new int [MaxGames];
-	  for (int i = 0; i < nbExamples; i++) 
-	    indexValidation [i] = (int) (((float)rand () / (RAND_MAX + 1.0)) * nbPositionsSGF);
-	  for (int i = 0; i < MaxGames; i++) {
-	    validationGame [i] = false;
-	    nbTimesGameIsUsed [i] = 0;
-	  }
-	}
+	// if (!loaded) {
+	//   memcpy (historyBoard [0], board.board, MaxSize);
+	//   init_all_moves ();
+	//   int seed = time (NULL);
+	//   srand (seed); // if we run again the same model examples should be different
+        //   fprintf (stderr, "load games.data, seed = %d, RAND_MAX = %d, rand () = %d\n", seed, RAND_MAX, rand ());
+	//   loadGamesData ("games.data");
+        //   fprintf (stderr, "MaxGroups = %d\n", MaxGroups);
+	//   loaded = true;
+	//   indexValidation = new int [nbExamples];
+	//   validationGame = new bool [MaxGames];
+	//   nbTimesGameIsUsed = new int [MaxGames];
+	//   for (int i = 0; i < nbExamples; i++) 
+	//     indexValidation [i] = (int) (((float)rand () / (RAND_MAX + 1.0)) * nbPositionsSGF);
+	//   for (int i = 0; i < MaxGames; i++) {
+	//     validationGame [i] = false;
+	//     nbTimesGameIsUsed [i] = 0;
+	//   }
+	// }
 	auto r = x.mutable_unchecked<4>();
 	auto pi = policy.mutable_unchecked<2>();
 	auto v = value.mutable_unchecked<1>();
@@ -63,13 +72,8 @@ PYBIND11_MODULE(golois, m) {
 	for (ssize_t i = 0; i < nbExamples; i++) {
 	  //fprintf (stderr, "i = %d, ", i);
 	  // choose a random state
-	  int pos = (int) (((float)rand () / (RAND_MAX + 1.0)) * nbPositionsSGF);
+	  int pos = (index + i) % nbPositionsSGF;
 	  int game = positionSGF [pos].game;
-	  while ((proGame [positionSGF [pos].game] [positionSGF [pos].move].inter == 361) 
-		 || validationGame [game]) {
-	    pos = (int) (((float)rand () / (RAND_MAX + 1.0)) * nbPositionsSGF);
-	    game = positionSGF [pos].game;
-	  }
 	  //nbTimesExampleIsUsed [pos]++;
 	  //nbTimesGameIsUsed [game]++;
 	  //fprintf (stderr, "pos = %d, positionSGF [pos].game = %d, positionSGF [pos].move = %d\n",
@@ -77,6 +81,7 @@ PYBIND11_MODULE(golois, m) {
 	  b = board;
 	  for (int j = 0; j < positionSGF [pos].move; j++)
 	    playColor (&b, proGame [positionSGF [pos].game] [j].inter, proGame [positionSGF [pos].game] [j].color);
+	  b.komi [White] = komi [positionSGF [pos].game];
 	  //fprintf (stderr, "fill the input\n");
 	  // fill the input
 	  int turn = b.turn;
@@ -84,12 +89,9 @@ PYBIND11_MODULE(golois, m) {
 	  if (b.turn == Black)
 	    other = White;
 	  int randomSym = 0;
-  	  if (false)
-	    encode (&b);
-  	  else {
-	    randomSym = rand () % 8;
-	    encodeSym (&b, randomSym);
-	  }
+	  randomSym = rand () % 8;
+	  //encodeSym (&b, randomSym);
+	  encodeSymKomi (&b, randomSym);
 	  for (ssize_t j = 0; j < r.shape(1); j++)
 	    for (ssize_t k = 0; k < r.shape(2); k++)
 	      for (ssize_t l = 0; l < r.shape(3); l++) {
@@ -107,10 +109,29 @@ PYBIND11_MODULE(golois, m) {
 	  move = sym [move] [randomSym];
 	  pi (i, move) = 1.0;
 	  // fill the value
-	  if (winner [positionSGF [pos].game] == 'W')
-	    v (i) = 1.0;
-	  else
-	    v (i) = 0.0;
+	  v (i) = proGame [positionSGF [pos].game] [positionSGF [pos].move].val;
+	  //if (winner [positionSGF [pos].game] == 'W') {
+	  //v (i) = 1.0;
+	    /*
+	    if (soft < 1.0) {
+	      if (positionSGF [pos].move > 200)
+		v (i) = 1.0;
+	      else
+		v (i) = soft + (1.0 - soft) * positionSGF [pos].move / 200.0;
+	    }
+	    */
+	  //}
+	  //else {
+	  //v (i) = 0.0;
+	    /*
+	    if (soft < 1.0) {
+	      if (positionSGF [pos].move > 200)
+		v (i) = 0.0;
+	      else
+		v (i) = 1.0 - soft - (1.0 - soft) * positionSGF [pos].move / 200.0;
+	    }
+	    */
+	  //}
 	  //fprintf (stderr, "fill the endgame\n");
 	  // fill the endgame
 	  for (int j = positionSGF [pos].move; j < nbMovesSGFGame [positionSGF [pos].game]; j++) {
@@ -149,11 +170,13 @@ PYBIND11_MODULE(golois, m) {
 	if (!loaded) {
 	  memcpy (historyBoard [0], board.board, MaxSize);
 	  init_all_moves ();
-	  int seed = time (NULL);
-	  srand (seed); // no, deterministic for getBatch (same seed = 0, same validation set)
-          fprintf (stderr, "load games.data, seed = %d, RAND_MAX = %d, rand () = %d\n", seed, RAND_MAX, rand ());
+	  //int seed = time (NULL);
+	  //srand (seed); // no, deterministic for getBatch (same seed = 0, same validation set)
+          //fprintf (stderr, "load games.data, seed = %d, RAND_MAX = %d, rand () = %d\n", seed, RAND_MAX, rand ());
+	  srand (0);
 	  loadGamesData ("games.data");
 	  loaded = true;
+	  shuffle ();
 	  indexValidation = new int [nbExamples];
 	  validationGame = new bool [MaxGames];
 	  nbTimesGameIsUsed = new int [MaxGames];
@@ -171,7 +194,7 @@ PYBIND11_MODULE(golois, m) {
 	      int pos = (int) (((float)rand () / (RAND_MAX + 1.0)) * nbPositionsSGF);
 	      //int pos = rand () % nbPositionsSGF;
 	      int game = positionSGF [pos].game;
-	      while ((proGame [positionSGF [pos].game] [positionSGF [pos].move].inter == 361) || validationGame [game]) {
+	      while ((proGame [positionSGF [pos].game] [positionSGF [pos].move].inter == 361) || validationGame [game] || (pos >= nbPositionsSGF - nbExamples)) {
 		pos = (int) (((float)rand () / (RAND_MAX + 1.0)) * nbPositionsSGF);
 		//pos = rand () % nbPositionsSGF;
 		game = positionSGF [pos].game;
@@ -195,6 +218,32 @@ PYBIND11_MODULE(golois, m) {
 	    }
 	    fclose (fp);
 	  }
+	  for (ssize_t i = 0; i < nbExamples; i++) {
+	    int pos = indexValidation [i];
+	    PositionSGF p = positionSGF [pos];
+	    positionSGF [pos] = positionSGF [nbPositionsSGF - 1];
+	    positionSGF [nbPositionsSGF - 1] = p;
+	    indexValidation [i] = nbPositionsSGF - 1;
+	    nbPositionsSGF--;
+	  }
+	  // remove pass and validation from positionSGF
+	  // bug : remove validation games
+	  /**/
+	  int i = 0;
+	  while (i < nbPositionsSGF) {
+	    int game = positionSGF [i].game;
+	    if ((proGame [positionSGF [i].game] [positionSGF [i].move].inter == 361) 
+	      || validationGame [game]) {
+	      PositionSGF p = positionSGF [i];
+	      positionSGF [i] = positionSGF [nbPositionsSGF - 1];
+	      positionSGF [nbPositionsSGF - 1] = p;
+	      nbPositionsSGF--;
+	    }
+	    else {
+	      i++;
+	    }
+	  }
+	  /**/
 	}
 	for (ssize_t i = 0; i < nbExamples; i++) {
 	  int pos = indexValidation [i];
@@ -202,6 +251,7 @@ PYBIND11_MODULE(golois, m) {
 	  b = board;
 	  for (int j = 0; j < positionSGF [pos].move; j++)
 	    playColor (&b, proGame [positionSGF [pos].game] [j].inter, proGame [positionSGF [pos].game] [j].color);
+	  b.komi [White] = komi [positionSGF [pos].game];
 	  //fprintf (stderr, "fill the input\n");
 	  // fill the input
 	  int turn = b.turn;
@@ -209,12 +259,9 @@ PYBIND11_MODULE(golois, m) {
 	  if (b.turn == Black)
 	    other = White;
 	  int randomSym = 0;
-  	  if (false)
-	    encode (&b);
-  	  else {
-	    randomSym = pos % 8; 
-	    encodeSym (&b, randomSym);
-	  }
+	  randomSym = pos % 8; 
+	  //encodeSym (&b, randomSym);
+	  encodeSymKomi (&b, randomSym);
 	  for (ssize_t j = 0; j < r.shape(1); j++)
 	    for (ssize_t k = 0; k < r.shape(2); k++)
 	      for (ssize_t l = 0; l < r.shape(3); l++) {
@@ -227,10 +274,13 @@ PYBIND11_MODULE(golois, m) {
 	  move = sym [move] [randomSym];
 	  pi (i, move) = 1.0;
 	  // fill the value
+	  v (i) = proGame [positionSGF [pos].game] [positionSGF [pos].move].val;
+	  /*
 	  if (winner [positionSGF [pos].game] == 'W')
 	    v (i) = 1.0;
 	  else
 	    v (i) = 0.0;
+	  */
 	  //fprintf (stderr, "fill the endgame\n");
 	  // fill the endgame
 	  for (int j = positionSGF [pos].move; j < nbMovesSGFGame [positionSGF [pos].game]; j++) {
@@ -282,6 +332,7 @@ PYBIND11_MODULE(golois, m) {
 	  b = board;
 	  for (int j = 0; j < positionSGF [pos].move; j++)
 	    playColor (&b, proGame [positionSGF [pos].game] [j].inter, proGame [positionSGF [pos].game] [j].color);
+	  b.komi [White] = komi [positionSGF [pos].game];
 	  //fprintf (stderr, "fill the input\n");
 	  // fill the input
 	  int turn = b.turn;
@@ -289,12 +340,9 @@ PYBIND11_MODULE(golois, m) {
 	  if (b.turn == Black)
 	    other = White;
 	  int randomSym = 0;
-  	  if (false)
-	    encode (&b);
-  	  else {
-	    randomSym = rand () % 8;
-	    encodeSym (&b, randomSym);
-	  }
+	  randomSym = rand () % 8;
+	  //encodeSym (&b, randomSym);
+	  encodeSymKomi (&b, randomSym);
 	  float val = proGame [positionSGF [pos].game] [positionSGF [pos].move].val;
 	  if (rand () % 2 == 0)
 	    val = 0.0;
@@ -313,10 +361,13 @@ PYBIND11_MODULE(golois, m) {
 	  move = sym [move] [randomSym];
 	  pi (i, move) = 1.0;
 	  // fill the value
+	  v (i) = proGame [positionSGF [pos].game] [positionSGF [pos].move].val;
+	  /*
 	  if (winner [positionSGF [pos].game] == 'W')
 	    v (i) = 1.0;
 	  else
 	    v (i) = 0.0;
+	  */
 	  //fprintf (stderr, "fill the endgame\n");
 	  // fill the endgame
 	  for (int j = positionSGF [pos].move; j < nbMovesSGFGame [positionSGF [pos].game]; j++) {
