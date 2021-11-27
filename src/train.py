@@ -41,7 +41,7 @@ if __name__ == '__main__':
     # Build the model 
     dgm_v0 = DGM_MOBILENET() 
     model = dgm_v0.build_model()
-    dgm_v0.plot_model()
+    #dgm_v0.plot_model()
     model.summary()
 
     print('getting validation...')
