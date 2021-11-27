@@ -137,3 +137,4 @@ var
 venv
 .ipynb_checkpoints
 ipynb_checkpoints
+*.so

@@ -14,20 +14,20 @@ def train(model):
     histories = {} 
     for i in range (1, config.n_epochs + 1):
         print (f' Epoch [{i}]')
-        golois.getBatch(input_data, policy, value, end, groups, i)
+        golois.getBatch(input_data, policy, value, end, groups, i*config.n_samples)
         with tf.device('/device:GPU:0'):
             history = model.fit(input_data,{'policy': policy, 'value': value}, 
                                 epochs=1, batch_size=config.batch_size )
             histories[i] = history.history
-        if (i % 10 == 0):
+        if (i % 5 == 0):
             golois.getValidation(input_data, policy, value, end)
             val = model.evaluate(input_data,[policy, value], 
                                 verbose = 0, batch_size=config.batch_size )
             print (f' Validation : {val}')
 
-    model.save ('DGV0.h5')
+    model.save ('DGV1.h5')
     
-    with open('DGV0_history', 'wb') as f_hist:
+    with open('DGV1_history', 'wb') as f_hist:
         pickle.dump(histories, f_hist)
 
     return histories
