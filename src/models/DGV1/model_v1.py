@@ -6,7 +6,7 @@ from tensorflow.keras.utils import plot_model
 from tensorflow.keras import layers, regularizers,activations
 
 from config import config 
-from DGV0.model import DGM
+from models.DGV0.model import DGM
 # end imports
 
 
