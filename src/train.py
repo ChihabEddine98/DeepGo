@@ -5,7 +5,7 @@ import golois
 
 from config import config
 from dataloader import DataHandler
-from model import DGM
+from models.DGV1.model_v1 import DGM_MOBILENET
 
 
 
