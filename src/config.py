@@ -11,7 +11,7 @@ class dotdict(dict):
 
 config = dotdict({  'n_planes' : 31,
                     'n_moves'  : 361,
-                    'n_samples': 50_000,
+                    'n_samples': 20_000,
                     'dim'      : 19 ,
                     'n_filters'     : 512,
                     'kernel'        : 5,
