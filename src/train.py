@@ -39,7 +39,7 @@ if __name__ == '__main__':
     input_data , policy , value , end , groups = data_loader.get_data() 
 
     # Build the model 
-    dgm_v0 = DGM() 
+    dgm_v0 = DGM_MOBILENET() 
     model = dgm_v0.build_model()
     dgm_v0.plot_model()
     model.summary()
