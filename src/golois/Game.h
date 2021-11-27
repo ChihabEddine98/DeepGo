@@ -1,12 +1,14 @@
 
-const int MaxGames = 500000;
+const int MaxGames = 1000000;
 const int MaxMoveGame = 1000;
+const int MaxExamples = 300000000;
 int nbGames = 0;
 int startGame [MaxGames];
 int nbMovesSGFGame [MaxGames];
 //Move proGame [MaxGames] [MaxMoveGame];
 Move *proGame [MaxGames];
 char winner [MaxGames];
+float komi [MaxGames];
 
 bool proGameAllocated = false;
 
@@ -97,10 +99,12 @@ void loadGamesOneFile (char * name) {
   if (positionSGF == NULL)
     positionSGF = new PositionSGF [MaxGames * MaxMoveGame];
   if (fp != NULL) {
+    int lines = 0;
     while (true) {
       Board b = board;
       int res = b.loadSGF (fp);
-      fprintf (stderr, "%d", res);
+      lines++;
+      fprintf (stderr, "%d %d ", res, lines);
       if (res == 0)
 	break;
       bool use = true;
@@ -113,25 +117,32 @@ void loadGamesOneFile (char * name) {
       //if ((b.winner == 'B') && (b.komi [White] < 7.5))
       //use = false;
       //if (b.komi [White] != 7.5)
-      if ((b.komi [White] > 7.5) || (b.komi [White] < 5.5))
+
+      if ((b.komi [White] > 9.5) || (b.komi [White] < 0.5))
 	use = false;
+      if ((int)(2 * b.komi [White]) == 2 * (int)(b.komi [White]))
+	use = false;
+
       //if ((res != -1) && ((b.winner == 'B') || (b.winner == 'W'))) {
       if (use) {
 	//if (nbGames == 180)
 	//b.print (stderr);
 	winner [nbGames] = b.winner;
+	komi [nbGames] = b.komi [White];
 	nbMovesSGFGame [nbGames] = 0;
-	startGame [nbGames] = b.startGame;
-	fprintf (stderr, " start = %d ", b.startGame);
+	//startGame [nbGames] = b.startGame;
+	//fprintf (stderr, " start = %d ", b.startGame);
 	for (int i = 0; i < b.NbMovesPlayed; i++) {
 	  //if (b.Moves [i] != b.passe) {
 	  Move m;
 	  m.inter = moveInter [b.Moves [i]];
 	  m.color = b.colorMove [i];
-	  if (i == 0)
-	    m.val = 0.0;
-	  else
-	    m.val = b.val [i - 1];
+	  //if (i == 0)
+	  //m.val = 0.0;
+	  //else
+	  //m.val = b.val [i - 1];
+	  m.val = b.val [i];
+	  m.points = b.points [i];
 	  //fprintf (stderr, "m.val = %2.3f ", m.val);
 	  if (nbMovesSGFGame [nbGames] < MaxMoveGame - 1) {
 	    proGame [nbGames] [nbMovesSGFGame [nbGames]] = m;
@@ -161,11 +172,12 @@ void writeGamesData (char * name) {
     fprintf (fp, "%d\n", nb);
     for (int g = 0; g < nbGames; g++)
       if ((winner [g] == 'W') || (winner [g] == 'B')) {
+        fprintf (fp, "%2.1f ", komi [g]);
         fprintf (fp, "%c ", winner [g]);
 	fprintf (fp, "%d ", nbMovesSGFGame [g]);
-	fprintf (fp, "%d ", startGame [g]);
+	//fprintf (fp, "%d ", startGame [g]);
         for (int i = 0; i < nbMovesSGFGame [g]; i++) {
-          fprintf (fp, "%d %d ", proGame [g] [i].inter, proGame [g] [i].color);
+          fprintf (fp, "%d %d %2.2f %2.2f ", proGame [g] [i].inter, proGame [g] [i].color, proGame [g] [i].val, proGame [g] [i].points);
         }
         fprintf (fp, "\n");
       }
@@ -174,11 +186,11 @@ void writeGamesData (char * name) {
 }
 
 void loadGamesData (char * name) {
-  if (!proGameAllocated) {
-    proGameAllocated = true;
-    for (int i = 0; i < MaxGames; i++)
-      proGame [i] = new Move [MaxMoveGame];
-  }
+  //if (!proGameAllocated) {
+  //proGameAllocated = true;
+  //for (int i = 0; i < MaxGames; i++)
+  //  proGame [i] = new Move [MaxMoveGame];
+  //}
 
   FILE * fp = fopen (name, "r");
   if (fp == NULL) {
@@ -188,25 +200,24 @@ void loadGamesData (char * name) {
   char s [1000];
   nbPositionsSGF = 0;
   if (positionSGF == NULL)
-    positionSGF = new PositionSGF [MaxGames * MaxMoveGame];
+    //positionSGF = new PositionSGF [MaxGames * MaxMoveGame];
+    positionSGF = new PositionSGF [MaxExamples];
   if (fp != NULL) {
     fscanf (fp, "%d", &nbGames);
-    if (nbGames > MaxGames)
-      nbGames = MaxGames;
     for (int g = 0; g < nbGames; g++) {
+      fscanf (fp, "%f", &komi [g]);
       fscanf (fp, "%s ", s);
       winner [g] = s [0];
       //fprintf (stderr, "%c", winner [g]);
       fscanf (fp, "%d", &nbMovesSGFGame [g]);
-      fscanf (fp, "%d", &startGame [g]);
+      proGame [g] = new Move [nbMovesSGFGame [g] + 1];
+      //fscanf (fp, "%d", &startGame [g]);
       Board b = board;
       bool illegal = false;
       int prevnb = nbPositionsSGF;
       for (int i = 0; i < nbMovesSGFGame [g]; i++) {
-        fscanf (fp, "%d %d", &proGame [g] [i].inter, &proGame [g] [i].color);
+        fscanf (fp, "%d %d %f %f", &proGame [g] [i].inter, &proGame [g] [i].color, &proGame [g] [i].val, &proGame [g] [i].points);
 	if (!illegal) {
-          positionSGF [nbPositionsSGF].game = g;
-          positionSGF [nbPositionsSGF].move = i;
           int move = proGame [g] [i].inter;
           if (move != 361) {
 	    if (b.board [interMove [move]] != Empty) {
@@ -236,8 +247,13 @@ void loadGamesData (char * name) {
 	  }
           if (!illegal) {
             b.joue (interMove [move], proGame [g] [i].color);
-	    if ((move != 361) && (i >= startGame [g]))
-	      nbPositionsSGF++;
+	    //if ((move != 361) && (i >= startGame [g]))
+	    if (proGame [g] [i].val > -1.0) {
+	      positionSGF [nbPositionsSGF].game = g;
+	      positionSGF [nbPositionsSGF].move = i;
+	      if (move != 361)
+		nbPositionsSGF++;
+	    }
           }
         }
       }
@@ -338,7 +354,7 @@ void playColor (Board * board, int move, int color) {
   //board->print (stderr);
 }
 
-float input [19] [19] [2 * Planes + 5 + MaxLib];
+float input [19] [19] [2 * Planes + 5 + MaxLib + 10];
 float group [19] [19] [1];
 
 void encode (Board * board) {
@@ -514,6 +530,25 @@ void encodeSym (Board * board, int randomSym) {
     }
     current--;
   }   
+}
+
+void encodeSymKomi (Board * board, int randomSym) {
+  encodeSym (board, randomSym);
+  for (int k = 0; k < 10; k++) {
+    int p = 2 * Planes + 5 + MaxLib + k;
+    if ((int)(board->komi [White]) == k) {
+      for (int i = 0; i < 19; i++)
+	for (int j = 0; j < 19; j++) {
+	  input [i] [j] [p] = 1.0;
+	}
+    }
+    else {
+      for (int i = 0; i < 19; i++)
+	for (int j = 0; j < 19; j++) {
+	  input [i] [j] [p] = 0.0;
+	}
+    }
+  }
 }
 
 

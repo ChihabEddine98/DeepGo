@@ -45,7 +45,7 @@ if __name__ == '__main__':
     model.summary()
 
     print('getting validation...')
-    #golois.getValidation(input_data, policy, value, end)
+    golois.getValidation(input_data, policy, value, end)
 
 
     model.compile(optimizer=keras.optimizers.Adam(learning_rate=config.lr),
