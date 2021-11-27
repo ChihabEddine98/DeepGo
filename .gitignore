@@ -129,7 +129,6 @@ dmypy.json
 .pyre/
 
 # SELF
-data
 .idea
 var
 .vscode
