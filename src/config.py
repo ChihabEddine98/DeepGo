@@ -11,22 +11,22 @@ class dotdict(dict):
 
 config = dotdict({  'n_planes' : 31,
                     'n_moves'  : 361,
-                    'n_samples': 20_000,
+                    'n_samples': 10_000,
                     'dim'      : 19 ,
-                    'n_filters'     : 512,
+                    'n_filters'     : 300,
                     'kernel'        : 5,
                     'n_res_blocks'  : 6,
                     'l2_reg'        : 0.0001,
-                    'dropout_ratio' : 0.5,
+                    'dropout_ratio' : 0.4,
                     'n_epochs'      : 30,
                     'batch_size'    : 64 ,
                     'policy_w'      : 0.5,
                     'value_w'       : 0.5,
-                    'lr'            : 0.1,
+                    'lr'            : 0.05,
                     'beta_1'        : 0.9,
                     'beta_2'        : 0.999,
-                    'n_btnk_blocks' : 6,
-                    'squeeze'       : 128,
+                    'n_btnk_blocks' : 8,
+                    'squeeze'       : 96,
                 })
 
 # DATA
