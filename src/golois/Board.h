@@ -79,6 +79,10 @@ void printVertex (FILE *fp, int m) {
   fprintf (fp, "%c%d", c, 19 - m / Dx);
 }
 
+void printMove (FILE *fp, int m) {
+  printVertex (fp, m);
+}
+
 std::string getVertex (int m) {
   int x = m % Dx;
   if (x > 7)
@@ -96,7 +100,7 @@ class Move {
   short int inter;
   char color;
   //short int code;
-  float val;
+  float val, points;
 
   int number () {
     int c = 0;
@@ -145,6 +149,7 @@ class Board {
   Move rollout [MaxPlayoutLength];
   int classRollout [MaxPlayoutLength];
   float val [MaxPlayoutLength];
+  float points [MaxPlayoutLength];
   int startGame;
   int length;
 
@@ -780,6 +785,20 @@ class Board {
           return dyBoard - y;
         else
           return dxBoard - x;
+  }
+
+  bool symmetric () {
+    for (int x = 0; x < 19; x++)
+      for (int y = 0; y < 19; y++)
+	if ((x != 9) || (y != 9)) {
+	  if (board [interMove [x + 19 * y]] == Black)
+	    if (board [interMove [18 - x + 19 * (18 - y)]] != White)
+	      return false;
+	  if (board [interMove [x + 19 * y]] == White)
+	    if (board [interMove [18 - x + 19 * (18 - y)]] != Black)
+	      return false;
+	}
+    return true;
   }
 
   void posePierre (int inter, int couleur, int pile [5]) {
@@ -3621,7 +3640,8 @@ class Board {
   int loadSGF (FILE * SgfFile) {
     char x, y;
     char lastCommand [MaxSGFCommandSize], Command [MaxSGFCommandSize], InsideBracket [MaxSGFCommandSize];
-    
+
+    int res = 0;
     winner = 'U';
     if (SgfFile!=NULL) {
       bool bypass = false;
@@ -3645,15 +3665,23 @@ class Board {
 	if (!strcmp(Command,"AB")) {
           handicap = true;
 	  if (sscanf (InsideBracket, "%c%c", &x, &y) == 2)
-	    if ((x<'t')&&(x>='a')&&(y<'t')&&(y>='a'))
+	    if ((x<'t')&&(x>='a')&&(y<'t')&&(y>='a')) {
 	      joue (interMove [x - 'a' + Dx * (y - 'a')], Black);
-	  startGame = length;
+	      length++;
+	      val [length - 1] = -1.0;
+	      points [length - 1] = 0.0;
+	    }
+	  //startGame = length;
 	}
 	else if (!strcmp(Command,"AW")) {
 	  if (sscanf(InsideBracket,"%c%c",&x,&y)==2)
-	    if ((x<'t')&&(x>='a')&&(y<'t')&&(y>='a'))
+	    if ((x<'t')&&(x>='a')&&(y<'t')&&(y>='a')) {
 	      joue (interMove [x - 'a' + Dx * (y - 'a')], White);
-	  startGame = length;
+	      length++;
+	      val [length - 1] = -1.0;
+	      points [length - 1] = 0.0;
+	    }
+	  //startGame = length;
 	}
 	else if (!strcmp(Command,"RE")) {
 	  if (sscanf(InsideBracket,"%c",&x)==1) {
@@ -3670,61 +3698,83 @@ class Board {
 	  }
 	}
 	else if (!strncmp(Command,"W", 1) && (strlen (Command) == 1)) {
-	  // no move = pass move
-	  if (strlen(InsideBracket) < 2) {
-	    joue (passe, White);
-	    length++;
-	  }
-	  else if (sscanf(InsideBracket,"%c%c",&x,&y)==2) {
-	    if ((x<'t')&&(x>='a')&&(y<'t')&&(y>='a')) {
-              int inter = interMove [x - 'a' + Dx * (y - 'a')];
-	      if (board [inter] != Empty) {
-		fprintf (stderr, "\n\nErreur sgf W[%c%c]\n\n", x, y);
-		print (stderr);
-		return -1;
-	      }
-	      if (!legalMove (inter, White)) {
-		fprintf (stderr, "\n\nErreur legalMove sgf W[%c%c]\n\n", x, y);
-		return -1;
-	      }
-	      joue (inter, White);
-	      length++;
-	    }
-	    // pass move
-	    else if ((x=='t') && (y=='t')) {
+	  if (res > -1) {
+	    // no move = pass move
+	    if (strlen(InsideBracket) < 2) {
 	      joue (passe, White);
 	      length++;
+	      val [length - 1] = -1.0;
+	      points [length - 1] = 0.0;
+	    }
+	    else if (sscanf(InsideBracket,"%c%c",&x,&y)==2) {
+	      if ((x<'t')&&(x>='a')&&(y<'t')&&(y>='a')) {
+		int inter = interMove [x - 'a' + Dx * (y - 'a')];
+		if (board [inter] != Empty) {
+		  fprintf (stderr, "\n\nErreur sgf W[%c%c]\n\n", x, y);
+		  print (stderr);
+		  res = -1;
+		}
+		if (!legalMove (inter, White)) {
+		  //print (stderr);
+		  fprintf (stderr, "\n\nErreur legalMove sgf W[%c%c]\n\n", x, y);
+		  res = -1;
+		}
+		if (res > -1) {
+		  joue (inter, White);
+		  length++;
+		  val [length - 1] = -1.0;
+		  points [length - 1] = 0.0;
+		}
+	      }
+	      // pass move
+	      else if ((x=='t') && (y=='t')) {
+		joue (passe, White);
+		length++;
+		val [length - 1] = -1.0;
+		points [length - 1] = 0.0;
+	      }
 	    }
 	  }
 	}
 	else if (!strncmp(Command,"B", 1) && (strlen (Command) == 1)) {
-	  // no move
-	  if (strlen(InsideBracket) < 2) {
-	    joue (passe, Black);
-	    length++;
-	  }
-	  else if (sscanf(InsideBracket,"%c%c",&x,&y)==2) {
-	    if ((x<'t')&&(x>='a')&&(y<'t')&&(y>='a')) {
-	      //if 
-              int inter = interMove [x - 'a' + Dx * (y - 'a')];
-              if (board [inter] != Empty) {
-                fprintf (stderr, "\n\nErreur sgf B[%c%c]\n\n", x, y);
-                return -1;
-              }
-	      if (!legalMove (inter, Black)) {
-		fprintf (stderr, "\n\nErreur legalMove sgf B[%c%c]\n\n", x, y);
-		print (stderr);
-		return -1;
-	      }
- 	      joue (inter, Black);
-	      length++;
-	      //if (length == 15)
-	      //print (stderr);
-	    }
-	    // pass move
-	    else if ((x=='t') && (y=='t')) {
+	  if (res > -1) {
+	    // no move
+	    if (strlen(InsideBracket) < 2) {
 	      joue (passe, Black);
 	      length++;
+	      val [length - 1] = -1.0;
+	      points [length - 1] = 0.0;
+	    }
+	    else if (sscanf(InsideBracket,"%c%c",&x,&y)==2) {
+	      if ((x<'t')&&(x>='a')&&(y<'t')&&(y>='a')) {
+		//if 
+		int inter = interMove [x - 'a' + Dx * (y - 'a')];
+		if (board [inter] != Empty) {
+		  fprintf (stderr, "\n\nErreur sgf B[%c%c]\n\n", x, y);
+		  res = -1;
+		}
+		if (!legalMove (inter, Black)) {
+		  //print (stderr);
+		  fprintf (stderr, "\n\nErreur legalMove sgf B[%c%c]\n\n", x, y);
+		  print (stderr);
+		  res = -1;
+		}
+		if (res > -1) {
+		  joue (inter, Black);
+		  length++;
+		  val [length - 1] = -1.0;
+		  points [length - 1] = 0.0;
+		}
+		//if (length == 15)
+		//print (stderr);
+	      }
+	      // pass move
+	      else if ((x=='t') && (y=='t')) {
+		joue (passe, Black);
+		length++;
+		val [length - 1] = -1.0;
+		points [length - 1] = 0.0;
+	      }
 	    }
 	  }
 	}
@@ -3738,11 +3788,14 @@ class Board {
 	}
 	else if (!strncmp(Command,"C", 1)) {
 	  int i = 0;
-	  float v = 0.0;
+	  float v = 0.0, pts = 0.0, v1, v2;
 	  if (length > 0) {
-	    int res = sscanf (InsideBracket, "%d: %f", &i, &v);
+	    int res = sscanf (InsideBracket, "%f %f %f %f", &v, &v1, &v2, &pts);
 	    //fprintf (stderr, "%d, %f, ", length, v);
-	    val [length - 1] = v;
+	    if (res == 4) {
+	      val [length - 1] = v;
+	      points [length - 1] = pts;
+	    }
 	  }
 	}
       }
@@ -3751,6 +3804,8 @@ class Board {
       lengthMax = length;
       fprintf (stderr, "Longest sgf game = %d\n", lengthMax);
     }
+    if (res == -1)
+      return -1;
     // si il peut encore y avoir des problemes ensuite
     if (Command[0]==')') return 1;
     // sinon c'est qu'on est a la fin du fichier
