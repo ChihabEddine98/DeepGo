@@ -13,5 +13,5 @@ if __name__ == '__main__':
     trainer = Trainer(dgm)
 
     # Train
-    history = trainer.train(model)
+    history = trainer.train()
 

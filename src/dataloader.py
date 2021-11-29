@@ -2,7 +2,7 @@
 from numpy import zeros
 from numpy.random import randint
 from tensorflow.keras.utils import to_categorical
-from config import config
+from utils import configs
 # end imports
 
 '''
@@ -14,7 +14,7 @@ from config import config
 '''
 class DataHandler(object):
     
-    def __init__(self,n_samples=config.n_samples,dim=config.dim,n_moves=config.n_moves,n_planes=config.n_planes) -> None:
+    def __init__(self,n_samples=configs.n_samples,dim=configs.dim,n_moves=configs.n_moves,n_planes=configs.n_planes) -> None:
         super().__init__()
         self.n_samples = n_samples
         self.dim = dim
