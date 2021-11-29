@@ -19,7 +19,7 @@ from model import DGM
                             their new specific blocks or methods.
     -------------------------------------------------------------------------------------------
 '''
-class DGM_MOBILENET(DGM):
+class DGM_ShuffleNet(DGM):
     
     def __init__(self,version=1,dim=config.dim,n_moves=config.n_moves,n_planes=config.n_planes,
                 n_filters=config.n_filters,kernel_size=config.kernel,l2_reg=config.l2_reg
