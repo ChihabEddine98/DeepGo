@@ -28,14 +28,12 @@ config = DotDict({  'n_filters'     : 256,
 '''
 class DGM_ShuffleNet(DGM):
     
-    def __init__(self,version=1,n_filters=config.n_filters,kernel_size=config.kernel,l2_reg=config.l2_reg
+    def __init__(self,version=2,n_filters=config.n_filters,kernel_size=config.kernel,l2_reg=config.l2_reg
                 ,dropout=config.dropout,n_btnk_blocks=config.n_btnk_blocks,squeeze=config.squeeze) -> None:
         super().__init__(version=version,n_filters=n_filters,kernel_size=kernel_size,l2_reg=l2_reg,dropout=dropout)
 
         self.n_btnk_blocks = n_btnk_blocks
         self.squeeze = squeeze
-
-
 
     def body_block(self, x, n_blocks=config.n_btnk_blocks):
         # Bottelneck Blocks
