@@ -4,7 +4,7 @@ __pycache__/
 *$py.class
 
 # C extensions
-*.so
+#*.so
 
 # Distribution / packaging
 .Python
@@ -103,7 +103,7 @@ celerybeat.pid
 
 # Environments
 .env
-.venv
+#.venv
 env/
 venv/
 ENV/
@@ -132,7 +132,7 @@ dmypy.json
 .idea
 var
 .vscode
-.venv
+#.venv
 venv
 .ipynb_checkpoints
 ipynb_checkpoints
