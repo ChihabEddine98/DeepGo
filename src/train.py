@@ -6,7 +6,7 @@ if __name__ == '__main__':
 
     print(f'start training...')
     
-    # Build the model 
+        # Build the model 
     dgm = DGM_ShuffleNet() 
     model = dgm.build_model()
     dgm.summary()
