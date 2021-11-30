@@ -15,7 +15,7 @@ config = DotDict({  'n_filters'     : 256,
                     'l2_reg'        : 0.0001,
                     'dropout'       : 0.5,
                     'n_btnk_blocks' : 8,
-                    'squeeze'       : 128,
+                    'squeeze'       : 256,
                 })
 
 '''

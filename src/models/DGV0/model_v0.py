@@ -52,7 +52,7 @@ class DGM(object):
 
     def summary(self):
         self.model.summary()
-        
+    
     def plot_model(self,save_path='models/model_imgs'):
         
         if not self.model:
