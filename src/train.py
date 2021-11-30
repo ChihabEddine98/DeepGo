@@ -3,6 +3,8 @@ from trainer import Trainer
 
 
 if __name__ == '__main__':
+
+    print(f'start training...')
     
     # Build the model 
     dgm = DGM_ShuffleNet() 
