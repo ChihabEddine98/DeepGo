@@ -132,7 +132,9 @@ dmypy.json
 .idea
 var
 .vscode
-#.venv
+.venv
 venv
 .ipynb_checkpoints
 ipynb_checkpoints
+*.data
+*.g5k
