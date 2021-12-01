@@ -30,10 +30,10 @@ class Trainer(object):
         for i in range (1, self.config.n_epochs + 1):
             print (f' Epoch [{i}]')
             golois.getBatch(input_data, policy, value, end, groups, i*self.config.n_samples)
-            with tf.device(self.config.device):
-                history = self.model.fit(input_data,{'policy': policy, 'value': value}, 
+            #with tf.device(self.config.device):
+            history = self.model.fit(input_data,{'policy': policy, 'value': value}, 
                                     epochs=1, batch_size=self.config.batch_size )
-                histories[i] = history.history
+            histories[i] = history.history
             
             if (i % self.config.chkp_frq == 0) :
                 gc.collect()
