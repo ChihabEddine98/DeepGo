@@ -138,3 +138,5 @@ venv
 ipynb_checkpoints
 *.data
 *.g5k
+*.h5
+*.so

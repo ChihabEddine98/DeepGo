@@ -22,18 +22,19 @@ class DotDict(dict):
 
 configs = DotDict({ 'n_planes' : 31,
                     'n_moves'  : 361,
-                    'n_samples': 10_000,
+                    'n_samples': 25_000,
                     'dim'      : 19 ,
-                    'n_epochs'      : 30,
-                    'batch_size'    : 64 ,
+                    'n_epochs'      : 100,
+                    'batch_size'    : 128 ,
                     'policy_w'      : 0.5,
                     'value_w'       : 0.5,
-                    'lr'            : 0.05,
+                    'lr'            : 0.0005,
                     'beta_1'        : 0.9,
                     'beta_2'        : 0.999,
-                    'chkp_frq'      : 2,
+                    'chkp_frq'      : 10,
                     'print_frq'     : 5,
                     'verbose'       : 1,
-                    'device'        : '/device:GPU:0',
-                    'save_format'   : 'h5'
+                    'save_format'   : 'h5',
+                    'devices'       : ['/device:GPU:0','/device:GPU:1','/device:GPU:2','/device:GPU:3',
+                                       '/device:GPU:4','/device:GPU:5','/device:GPU:6','/device:GPU:7']
                 })
