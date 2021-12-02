@@ -1,13 +1,26 @@
 import pickle
-from math import cos,floor,pi
-from keras.callbacks import Callback
-from keras import backend
 import gc
 
-import golois
+from math import cos,floor,pi
 
+from keras.callbacks import Callback
+from keras import backend as K
+
+from rich.console import Console
+from rich.markdown import Markdown
+from rich.progress import track
+
+import golois
 from utils import configs
 from dataloader import DataHandler
+
+
+
+# calculate learning rate for an epoch
+def cosine_annealing(epoch, n_epochs, n_cycles, lr_max):
+    epochs_per_cycle = floor(n_epochs/n_cycles)
+    cos_inner = (pi * (epoch % epochs_per_cycle)) / (epochs_per_cycle)
+    return lr_max / 2 * (cos(cos_inner) + 1)
 
 class Scheduler(Callback):
 	# constructor
@@ -28,7 +41,7 @@ class Scheduler(Callback):
 		# calculate learning rate
 		lr = self.cosine_annealing(epoch, self.epochs, self.cycles, self.lr_max)
 		# set learning rate
-		backend.set_value(self.model.optimizer.lr, lr)
+		K.set_value(self.model.optimizer.lr, lr)
 		# log value
 		self.lrates.append(lr)
 
@@ -44,31 +57,40 @@ class Trainer(object):
         self.data_loader = DataHandler()
     
     def train(self):
+        console = Console()
         # Get Initial Data
         input_data , policy , value , end , groups = self.data_loader.get_data() 
+
         # Get Validation Data
-        print('getting validation...')
-        golois.getValidation(input_data, policy, value, end)
+        title = Markdown(f"# Getting validation.data", style='bold yellow')
+        console.print(title)
+        for _ in track(range(100)):
+            golois.getValidation(input_data, policy, value, end)
 
         histories = {} 
-        for i in range (1, self.config.n_epochs + 1):
-            print (f' Epoch [{i}]')
-            golois.getBatch(input_data, policy, value, end, groups, i*self.config.n_samples)
+        for epoch in range (1, self.config.n_epochs + 1):
+            title = Markdown(f"# ----- epoch [{epoch}/{self.config.n_epochs}] -----", style='bold yellow')
+            console.print(title)
+            #print (f' Epoch [{epoch}/{self.config.n_epochs}]')
+            golois.getBatch(input_data, policy, value, end, groups, epoch*self.config.n_samples)
             #with tf.device(self.config.device):
             if self.config.annealing :
-               scheduler = Scheduler(self.config.n_epochs,self.config.n_epochs // self.config.cycle,self.config.lr)
-               history = self.model.fit(input_data,{'policy': policy, 'value': value}, 
-                                         epochs=1, batch_size=self.config.batch_size , callbacks=[scheduler])
-            else:
-               history = self.model.fit(input_data,{'policy': policy, 'value': value}, 
-                        epochs=1, batch_size=self.config.batch_size)
+                title = Markdown(f"## Cosine Annealing...", style='bold green')
+                console.print(title)
+                lr = cosine_annealing(epoch, self.config.n_epochs, self.config.n_cycles, self.config.lr)
+                title = Markdown(f'# Old Learning Rate : {self.model.optimizer.lr} ===> New Learning Rate : {lr} ', style='bold green')
+                console.print(title)
+                K.set_value(self.model.optimizer.lr, lr)
+                
+            history = self.model.fit(input_data,{'policy': policy, 'value': value}, 
+                                        epochs=1, batch_size=self.config.batch_size)
                         
-            histories[i] = history.history
+            histories[epoch] = history.history
             
-            if (i % self.config.chkp_frq == 0) :
+            if (epoch % self.config.chkp_frq == 0) :
                 gc.collect()
 
-            if (i % self.config.print_frq == 0):
+            if (epoch % self.config.print_frq == 0):
                 print(f' Validating...')
                 golois.getValidation(input_data, policy, value, end)
                 val = self.model.evaluate(input_data,[policy, value], 
