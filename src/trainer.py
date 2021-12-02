@@ -1,5 +1,7 @@
 import pickle
-import tensorflow as tf 
+from math import cos,floor,pi
+from keras.callbacks import Callback
+from keras import backend
 import gc
 
 import golois
@@ -7,6 +9,28 @@ import golois
 from utils import configs
 from dataloader import DataHandler
 
+class Scheduler(Callback):
+	# constructor
+	def __init__(self, n_epochs, n_cycles, lrate_max, verbose=0):
+		self.epochs = n_epochs
+		self.cycles = n_cycles
+		self.lr_max = lrate_max
+		self.lrates = list()
+ 
+	# calculate learning rate for an epoch
+	def cosine_annealing(self, epoch, n_epochs, n_cycles, lrate_max):
+		epochs_per_cycle = floor(n_epochs/n_cycles)
+		cos_inner = (pi * (epoch % epochs_per_cycle)) / (epochs_per_cycle)
+		return lrate_max/2 * (cos(cos_inner) + 1)
+ 
+	# calculate and set learning rate at the start of the epoch
+	def on_epoch_begin(self, epoch, logs=None):
+		# calculate learning rate
+		lr = self.cosine_annealing(epoch, self.epochs, self.cycles, self.lr_max)
+		# set learning rate
+		backend.set_value(self.model.optimizer.lr, lr)
+		# log value
+		self.lrates.append(lr)
 
 class Trainer(object): 
     
@@ -31,8 +55,14 @@ class Trainer(object):
             print (f' Epoch [{i}]')
             golois.getBatch(input_data, policy, value, end, groups, i*self.config.n_samples)
             #with tf.device(self.config.device):
-            history = self.model.fit(input_data,{'policy': policy, 'value': value}, 
-                                    epochs=1, batch_size=self.config.batch_size )
+            if self.config.annealing :
+               scheduler = Scheduler(self.config.n_epochs,self.config.n_epochs // self.config.cycle,self.config.lr)
+               history = self.model.fit(input_data,{'policy': policy, 'value': value}, 
+                                         epochs=1, batch_size=self.config.batch_size , callbacks=[scheduler])
+            else:
+               history = self.model.fit(input_data,{'policy': policy, 'value': value}, 
+                        epochs=1, batch_size=self.config.batch_size)
+                        
             histories[i] = history.history
             
             if (i % self.config.chkp_frq == 0) :
@@ -50,4 +80,7 @@ class Trainer(object):
             pickle.dump(histories, f_hist)
 
         return histories
+
+
+
 
