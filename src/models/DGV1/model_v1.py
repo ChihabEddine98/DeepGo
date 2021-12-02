@@ -11,8 +11,8 @@ from models.DGV0.model_v0 import DGM
 
 
 config = DotDict({  'n_filters'     : 64,
-                    'kernel'        : 4,
-                    'n_res_blocks'  : 6,
+                    'kernel'        : 3,
+                    'n_res_blocks'  : 8,
                     'l2_reg'        : 0.0001,
                     'dropout'       : 0.5,
                 })
@@ -31,7 +31,8 @@ class DGMV1(DGM):
     
     def __init__(self,version=1,n_filters=config.n_filters,kernel_size=config.kernel,l2_reg=config.l2_reg
                 ,dropout=config.dropout) -> None:
-        super().__init__(version=version,n_filters=n_filters,kernel_size=kernel_size,l2_reg=l2_reg,dropout=dropout)
+        super().__init__(version=version,n_filters=n_filters,kernel_size=kernel_size,
+                        l2_reg=l2_reg,dropout=dropout,n_res_blocks=config.n_res_blocks)
 
     def input_block(self,inp,kernel_resize=5,pad='same'):
         # CONV2D + BN + activation 
@@ -48,10 +49,10 @@ class DGMV1(DGM):
         
         return x
     
-    def sub_residual_block(self,x1,ratio=2):
+    def sub_residual_block(self,x1,ratio=4):
         x = layers.Dropout(self.dropout)(x1)
         x = layers.GlobalAveragePooling2D()(x)
-        x = layers.Dense(50, activation='relu')(x)
+        x = layers.Dense(self.n_filters // ratio, activation='relu')(x)
         x = layers.Dense(self.n_filters, activation='sigmoid')(x)
         return layers.Multiply()([x1, x])
     
