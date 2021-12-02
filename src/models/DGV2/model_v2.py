@@ -59,8 +59,8 @@ class DGMV2(DGM):
 
     def body_block(self, x, n_blocks=config.n_btnk_blocks):
         # Bottelneck Blocks
-        for _ in range(n_blocks):
-                x = self.mbConv_block(x,DEFAULT_BLOCKS_ARGS)
+        for i in range(7):
+                x = self.mbConv_block(x,DEFAULT_BLOCKS_ARGS[i])
         return x 
       
 
