@@ -25,7 +25,7 @@ configs = DotDict({ 'n_planes' : 31,
                     'n_samples': 25_000,
                     'dim'      : 19 ,
                     'n_epochs'      : 250,
-                    'batch_size'    : 64 ,
+                    'batch_size'    : 128 ,
                     'policy_w'      : 1.0,
                     'value_w'       : 1.0,
                     'lr'            : 5e-2,
@@ -39,5 +39,8 @@ configs = DotDict({ 'n_planes' : 31,
                     'devices'       : ['/device:GPU:0','/device:GPU:1','/device:GPU:2','/device:GPU:3',
                                        '/device:GPU:4','/device:GPU:5','/device:GPU:6','/device:GPU:7'],
                     'n_cycles'      : 25,
-                    'annealing'     : True    
+                    'annealing'     : True,
+                    'info_style'    : "bold yellow",
+                    'succes_style'  : "bold green",
+                    'error_style'   : "bold red"   
                 })

@@ -12,8 +12,8 @@ from models.DGV0.model_v0 import DGM
 
 config = DotDict({  'n_filters'     : 64,
                     'kernel'        : 3,
-                    'n_res_blocks'  : 8,
-                    'l2_reg'        : 0.0001,
+                    'n_res_blocks'  : 10,
+                    'l2_reg'        : 1e-4,
                     'dropout'       : 0.5,
                 })
 
