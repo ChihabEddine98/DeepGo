@@ -62,23 +62,20 @@ class Trainer(object):
         input_data , policy , value , end , groups = self.data_loader.get_data() 
 
         # Get Validation Data
-        title = Markdown(f"# Getting validation.data", style='bold yellow')
+        title = Markdown(f"# Getting `validation.data`", style=self.config.succes_style)
         console.print(title)
-        for _ in track(range(100)):
-            golois.getValidation(input_data, policy, value, end)
+        golois.getValidation(input_data, policy, value, end)
 
         histories = {} 
         for epoch in range (1, self.config.n_epochs + 1):
-            title = Markdown(f"# ----- epoch [{epoch}/{self.config.n_epochs}] -----", style='bold yellow')
+            title = Markdown(f"# ----- epoch [{epoch}/{self.config.n_epochs}] -----", style=self.config.info_style)
             console.print(title)
             #print (f' Epoch [{epoch}/{self.config.n_epochs}]')
             golois.getBatch(input_data, policy, value, end, groups, epoch*self.config.n_samples)
             #with tf.device(self.config.device):
             if self.config.annealing :
-                title = Markdown(f"## Cosine Annealing...", style='bold green')
-                console.print(title)
                 lr = cosine_annealing(epoch, self.config.n_epochs, self.config.n_cycles, self.config.lr)
-                title = Markdown(f'# Old Learning Rate : {self.model.optimizer.lr} ===> New Learning Rate : {lr} ', style='bold green')
+                title = Markdown(f'# [LR-Cosine] Old Learning Rate : {K.eval(self.model.optimizer.lr)} ===> New Learning Rate : {lr} ', self.config.info_style)
                 console.print(title)
                 K.set_value(self.model.optimizer.lr, lr)
                 
@@ -91,13 +88,16 @@ class Trainer(object):
                 gc.collect()
 
             if (epoch % self.config.print_frq == 0):
-                print(f' Validating...')
+                title = Markdown(f"## Validating...", style=self.config.succes_style)
+                console.print(title)
                 golois.getValidation(input_data, policy, value, end)
                 val = self.model.evaluate(input_data,[policy, value], 
                                     verbose = self.config.verbose, batch_size=self.config.batch_size )
-                print (f' Validation : {val}')
+                title = Markdown(f"# Validation : {val}", style=self.config.succes_style)
+                console.print(title)
                 self.model.save(self.model_path)
         
+        title = Markdown(f"## END of Training Saving Last [DGM]...", style=self.config.succes_style)
         with open(self.hist_path, 'wb') as f_hist:
             pickle.dump(histories, f_hist)
 

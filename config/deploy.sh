@@ -119,6 +119,10 @@ sudo apt-get update
 sudo apt-get install libcudnn8=${cudnn_version}-1+${cuda_version} # cudnn_version  = 8.1.0.* , cuda_version cuda11.2
 sudo apt-get install libcudnn8-dev=${cudnn_version}-1+${cuda_version}
 
+# Check GPU with TF
+# from tensorflow.python.client import device_lib 
+# print(device_lib.list_local_devices())
+
 echo 'Configuring Repository[DeepGo]...'
 # Repository Installation
 git clone https://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@github.com/ChihabEddine98/DeepGo.git
