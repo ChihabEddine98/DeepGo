@@ -4,7 +4,7 @@ __pycache__/
 *$py.class
 
 # C extensions
-#*.so
+*.so
 
 # Distribution / packaging
 .Python
@@ -138,5 +138,5 @@ venv
 ipynb_checkpoints
 *.data
 *.g5k
-*.h5
+#*.h5
 *.so

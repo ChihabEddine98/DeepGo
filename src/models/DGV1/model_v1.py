@@ -10,7 +10,7 @@ from models.DGV0.model_v0 import DGM
 
 
 
-config = DotDict({  'n_filters'     : 64,
+config = DotDict({  'n_filters'     : 75,
                     'kernel'        : 3,
                     'n_res_blocks'  : 10,
                     'l2_reg'        : 1e-4,
@@ -66,7 +66,7 @@ class DGMV1(DGM):
 
     def output_value_block(self,x):
         value_head = layers.GlobalAveragePooling2D()(x)
-        value_head = layers.Dense(self.n_filters//2, kernel_regularizer=self.l2_reg)(value_head)
+        value_head = layers.Dense(50, kernel_regularizer=self.l2_reg)(value_head)
         value_head = self.activation(value_head)
         value_head = layers.BatchNormalization()(value_head)
         value_head = layers.Dropout(self.dropout)(value_head)
