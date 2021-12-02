@@ -60,7 +60,8 @@ class DGMV2(DGM):
     def body_block(self, x, n_blocks=config.n_btnk_blocks):
         # Bottelneck Blocks
         for i in range(7):
-                x = self.mbConv_block(x,DEFAULT_BLOCKS_ARGS[i])
+             x = self.mbConv_block(x,DEFAULT_BLOCKS_ARGS[i])
+
         return x 
       
 
@@ -91,17 +92,34 @@ class DGMV2(DGM):
 
         x = layers.Conv2D(expanded_filters, 1, padding='same', use_bias=0)(input_data)
         x = layers.BatchNormalization()(x)
-        x = self.activation()
+        x = self.activation(x)
 
         x = layers.DepthwiseConv2D(kernel_size, strides, padding='same', use_bias=0)(x)
         x = layers.BatchNormalization()(x)
-        x = self.activation()
+        x = self.activation(x)
         
-        se = self.se_block(64,0.25)
-        x = layers.Multiply([x, se])
+        #se = self.se_block(input_filters,0.25)
+        #x = layers.Multiply([x, se])
 
 
         x = layers.Conv2D(output_filters, 1, padding='same', use_bias=0)(x)
         x = layers.BatchNormalization()(x)
-        x = self.activation()
+        x = self.activation(x)
         return x
+
+    def output_policy_block(self,x):
+        policy_head = layers.Conv2D(1, 1, padding='same', use_bias=False, kernel_regularizer=self.l2_reg)(x)
+        policy_head = self.activation(policy_head)
+        policy_head = layers.BatchNormalization()(policy_head)
+        policy_head = layers.Flatten()(policy_head)
+        policy_head = layers.Activation('softmax', name='policy')(policy_head)
+        return policy_head
+
+    def output_value_block(self,x):
+        value_head = layers.GlobalAveragePooling2D()(x)
+        value_head = layers.Dense(50, kernel_regularizer=self.l2_reg)(value_head)
+        value_head = self.activation(value_head)
+        value_head = layers.BatchNormalization()(value_head)
+        value_head = layers.Dropout(self.dropout)(value_head)
+        value_head = layers.Dense(1, activation='sigmoid', name='value', kernel_regularizer=self.l2_reg)(value_head)
+        return value_head
