@@ -59,8 +59,8 @@ class DGMV2(DGM):
 
     def body_block(self, x, n_blocks=config.n_btnk_blocks):
         # Bottelneck Blocks
-        for _ in range(n_blocks):
-                x = self.mbConv_block(x,DEFAULT_BLOCKS_ARGS)
+        for i in range(7):
+             x = self.mbConv_block(x,DEFAULT_BLOCKS_ARGS[i])
         return x 
       
 
@@ -91,17 +91,17 @@ class DGMV2(DGM):
 
         x = layers.Conv2D(expanded_filters, 1, padding='same', use_bias=0)(input_data)
         x = layers.BatchNormalization()(x)
-        x = self.activation()
+        x = self.activation(x)
 
         x = layers.DepthwiseConv2D(kernel_size, strides, padding='same', use_bias=0)(x)
         x = layers.BatchNormalization()(x)
-        x = self.activation()
+        x = self.activation(x)
         
-        se = self.se_block(64,0.25)
-        x = layers.Multiply([x, se])
+        #se = self.se_block(input_filters,0.25)
+        #x = layers.Multiply([x, se])
 
 
         x = layers.Conv2D(output_filters, 1, padding='same', use_bias=0)(x)
         x = layers.BatchNormalization()(x)
-        x = self.activation()
+        x = self.activation(x)
         return x
