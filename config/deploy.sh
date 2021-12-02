@@ -97,6 +97,8 @@ sh NVIDIA-Linux-x86_64-450.51.run -s --no-install-compat32-libs
 
 
 # heree yoohoooo ! 
+# To get Nvidia only gpu ! 
+# oarsub -p "gpu_count > 0 AND gpu_model NOT LIKE 'Radeon%'" -l host=1,walltime=2 -t deploy -t exotic -I
 # Use this to create the deb11 : 
 # kadeploy3 -f $OAR_NODE_FILE -e debian11-x64-std -k
 # Then : ssh root@`head -1 $OAR_NODE_FILE`

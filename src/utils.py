@@ -36,5 +36,7 @@ configs = DotDict({ 'n_planes' : 31,
                     'verbose'       : 1,
                     'save_format'   : 'h5',
                     'devices'       : ['/device:GPU:0','/device:GPU:1','/device:GPU:2','/device:GPU:3',
-                                       '/device:GPU:4','/device:GPU:5','/device:GPU:6','/device:GPU:7']
+                                       '/device:GPU:4','/device:GPU:5','/device:GPU:6','/device:GPU:7'],
+                    'cycle'         : 30,
+                    'annealing'     : True    
                 })

@@ -4,7 +4,7 @@ import tensorflow.nn as nn
 from tensorflow.keras import Input,Model
 from tensorflow.keras.utils import plot_model
 from tensorflow.keras import layers, regularizers,activations
-from tensorflow.keras.optimizers import Adam
+from tensorflow.keras.optimizers import SGD
 from utils import configs , DotDict 
 # end imports
 
@@ -79,7 +79,7 @@ class DGM(object):
         self.model = Model(inputs=inp, outputs=[policy_head, value_head])
 
         self.model.compile(
-                optimizer=Adam(learning_rate=configs.lr),
+                optimizer=SGD(momentum=configs.beta_1),
                 loss={'policy': 'categorical_crossentropy', 'value': 'binary_crossentropy'},
                 loss_weights={'policy' : configs.policy_w, 'value' : configs.value_w},
                 metrics={'policy': 'categorical_accuracy', 'value': 'mse'})
