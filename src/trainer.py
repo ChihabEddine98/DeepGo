@@ -75,7 +75,7 @@ class Trainer(object):
             #with tf.device(self.config.device):
             if self.config.annealing :
                 lr = cosine_annealing(epoch, self.config.n_epochs, self.config.n_cycles, self.config.lr)
-                title = Markdown(f'# [LR-Cosine] Old Learning Rate : {K.eval(self.model.optimizer.lr)} ===> New Learning Rate : {lr} ', self.config.info_style)
+                title = Markdown(f'# [LR-Cosine] Old Learning Rate : `{K.eval(self.model.optimizer.lr):.7f}` ==> New Learning Rate : `{lr:.7f}` ', self.config.info_style)
                 console.print(title)
                 K.set_value(self.model.optimizer.lr, lr)
                 
