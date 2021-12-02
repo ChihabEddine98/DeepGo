@@ -1,5 +1,6 @@
 # imports
 import os
+import collections
 import tensorflow.nn as nn
 from tensorflow.keras import Input,Model
 from tensorflow.keras.utils import plot_model
@@ -18,15 +19,36 @@ config = DotDict({  'n_filters'     : 256,
                     'squeeze'       : 256,
                 })
 
+BlockArgs = collections.namedtuple('BlockArgs', [
+    'kernel_size', 'num_repeat', 'input_filters', 'output_filters',
+    'expand_ratio', 'id_skip', 'strides', 'se_ratio'
+])
+
+BlockArgs.__new__.__defaults__ = (None,) * len(BlockArgs._fields)
+
+DEFAULT_BLOCKS_ARGS = [
+    BlockArgs(kernel_size=3, num_repeat=1, input_filters=32, output_filters=16,
+              expand_ratio=1, id_skip=True, strides=[1, 1], se_ratio=0.25),
+    BlockArgs(kernel_size=3, num_repeat=2, input_filters=16, output_filters=24,
+              expand_ratio=6, id_skip=True, strides=[2, 2], se_ratio=0.25),
+    BlockArgs(kernel_size=5, num_repeat=2, input_filters=24, output_filters=40,
+              expand_ratio=6, id_skip=True, strides=[2, 2], se_ratio=0.25),
+    BlockArgs(kernel_size=3, num_repeat=3, input_filters=40, output_filters=80,
+              expand_ratio=6, id_skip=True, strides=[2, 2], se_ratio=0.25),
+    BlockArgs(kernel_size=5, num_repeat=3, input_filters=80, output_filters=112,
+              expand_ratio=6, id_skip=True, strides=[1, 1], se_ratio=0.25),
+    BlockArgs(kernel_size=5, num_repeat=4, input_filters=112, output_filters=192,
+              expand_ratio=6, id_skip=True, strides=[2, 2], se_ratio=0.25),
+    BlockArgs(kernel_size=3, num_repeat=1, input_filters=192, output_filters=320,
+              expand_ratio=6, id_skip=True, strides=[1, 1], se_ratio=0.25)
+]
+
 '''
     -------------------------------------------------------------------------------------------     
-        DGM (DeepGoModel) : in this class we handle all stuff related to the deep neural model
-                            who will represent our GO player all versions with different 
-                            architechtures will inheritat this basic methods and added to them
-                            their new specific blocks or methods.
+        DGM (DeepGoModel) : Efficient Net with Squeeze & Excitation Blocks / Swish 
     -------------------------------------------------------------------------------------------
 '''
-class DGM_ShuffleNet(DGM):
+class DGMV2(DGM):
     
     def __init__(self,version=2,n_filters=config.n_filters,kernel_size=config.kernel,l2_reg=config.l2_reg
                 ,dropout=config.dropout,n_btnk_blocks=config.n_btnk_blocks,squeeze=config.squeeze) -> None:
@@ -41,24 +63,48 @@ class DGM_ShuffleNet(DGM):
                 x = self.bottleneck_block(x)
         return x 
       
-    def bottleneck_block(self,x):
-        m = layers.Conv2D(self.n_filters,1, kernel_regularizer=self.l2_reg,use_bias=0)(x)
-        m = layers.BatchNormalization()(m)
-        m = nn.relu(m)
-      
-        m = layers.DepthwiseConv2D((5,5), padding='same',kernel_regularizer=self.l2_reg,use_bias=0)(m)
-        m = layers.BatchNormalization()(m)
-        m = nn.relu(m)
 
-        #m = layers.Dropout(self.dropout)(m)
+    def inverted_residual_block(self,x, expand=64, squeeze=16):
+        block = layers.Conv2D(expand, (1,1), activation='relu')(x)
+        block = layers.DepthwiseConv2D((3,3), activation='relu')(block)
+        block = layers.Conv2D(squeeze, (1,1), activation='relu')(block)
+        return layers.Add()([block, x])
 
-        m = layers.Conv2D(self.squeeze, 1,kernel_regularizer=self.l2_reg,use_bias=0)(m)
-        m = layers.BatchNormalization()(m)
+    def se_block(self,x, filters, squeeze_ratio=0.25):
+        x_ = layers.GlobalAveragePooling2D()(x)
+        x_ = layers.Reshape((1,1,filters))(x_)
+        squeezed_filters = max(1, int(filters * squeeze_ratio))
+        x_ = layers.Conv2D(squeezed_filters , activation='relu')(x_)
+        x_ = layers.Conv2D(filters, activation='sigmoid')(x_)
+        return layers.Multiply()([x, x_])
+    
+    def mbConv_block(self,input_data, block_arg):
+        kernel_size = block_arg.kernel_size
+        num_repeat  = block_arg.num_repeat
+        input_filters = block_arg.input_filters
+        output_filters = block_arg.output_filters
+        expand_ratio = block_arg.expand_ratio
+        id_skip = block_arg.id_skip
+        strides = block_arg.strides
+        se_ratio = block_arg.se_ratio
+        expanded_filters = input_filters * expand_ratio
 
-        
-        #m = layers.DepthwiseConv2D((5,5), padding='same',kernel_regularizer=self.l2_reg,use_bias=0)(m)
-        x = layers.Add()([m, x])
+        x = layers.Conv2D(expanded_filters, 1, padding='same', use_bias=0)(input_data)
+        x = layers.BatchNormalization()(x)
+        x = self.activation()
+
+        x = layers.DepthwiseConv2D(kernel_size, strides, padding='same', use_bias=0)(x)
+        x = layers.BatchNormalization()(x)
+        x = self.activation()
+
+        se = layers.GlobalAveragePooling2D()(x) 
+        se = layers.Reshape((1, 1, expanded_filters ))(x)
+        squeezed_filters = max(1, int(input_filters * se_ratio))
+        se = layers.Conv2D(squeezed_filters , 1, activation=self.activation, padding='same')(se)
+        se = layers.Conv2D(expanded_filters, 1, activation='sigmoid', padding='same')(se)
+        x = layers.Multiply([x, se])
+
+
+        x = layers.Conv2D(output_filters, 1, padding='same', use_bias=0)
+        x = layers.BatchNormalization()(x)
         return x
-
-    def activation(self,x):
-        return nn.swish(x)
