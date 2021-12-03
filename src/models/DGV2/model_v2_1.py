@@ -1,5 +1,4 @@
 # imports
-from _typeshed import Self
 import os
 import tensorflow.nn as nn
 from tensorflow.keras import Input,Model
