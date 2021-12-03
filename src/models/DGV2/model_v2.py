@@ -59,11 +59,29 @@ class DGMV2(DGM):
 
     def body_block(self, x, n_blocks=config.n_btnk_blocks):
         # Bottelneck Blocks
-        for i in range(7):
-             x = self.mbConv_block(x,DEFAULT_BLOCKS_ARGS[i])
-
+        for _ in range(self.n_btnk_blocks):
+             x = self.inception_block(x,[128,64,32,64,64,32],[1,3,5])
         return x 
-      
+    
+    def inception_block(self,x,filters,kernels):
+        t1 = layers.Conv2D(filters[0],kernels[0])(x)
+        t1 = self.activation(t1)
+
+        t2 = layers.Conv2D(filters[1],kernels[0])(x) 
+        t2 = self.activation(t2)
+        t2 = layers.Conv2D(filters[2],kernels[1],padding='same')(t2)
+        t2 = self.activation(t2)
+
+        t3 = layers.Conv2D(filters[3],kernels[0])(x) 
+        t3 = self.activation(t3)
+        t3 = layers.Conv2D(filters[4],kernels[2],padding='same')(t3)
+        t3 = self.activation(t3)
+        
+        t4 = layers.MaxPool2D(kernels[0],padding='same')(x) 
+        t4 = layers.Conv2D(filters[5],kernels[0])(t4)
+        t4 = self.activation(t4)
+        
+        return layers.Concatenate()([t1,t2,t3,t4])
 
     def inverted_residual_block(self,x, expand=64, squeeze=16):
         block = layers.Conv2D(expand, (1,1), activation='relu')(x)
