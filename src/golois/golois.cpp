@@ -67,8 +67,8 @@ PYBIND11_MODULE(golois, m) {
  	auto e = end.mutable_unchecked<4>();
  	auto g = groups.mutable_unchecked<4>();
 	nbExamples = r.shape (0);
-	fprintf (stderr, "r.shape = (%d, %d, %d, %d)\n", r.shape (0), r.shape (1), r.shape (2), r.shape (3));
-	fprintf (stderr, "nbExamples = %d\n", nbExamples);
+	//fprintf (stderr, "r.shape = (%d, %d, %d, %d)\n", r.shape (0), r.shape (1), r.shape (2), r.shape (3));
+	//fprintf (stderr, "nbExamples = %d\n", nbExamples);
 	for (ssize_t i = 0; i < nbExamples; i++) {
 	  //fprintf (stderr, "i = %d, ", i);
 	  // choose a random state
@@ -165,8 +165,8 @@ PYBIND11_MODULE(golois, m) {
 	auto v = value.mutable_unchecked<1>();
  	auto e = end.mutable_unchecked<4>();
 	nbExamples = r.shape (0);
-	fprintf (stderr, "r.shape = (%d, %d, %d, %d)\n", r.shape (0), r.shape (1), r.shape (2), r.shape (3));
-	fprintf (stderr, "nbExamples = %d\n", nbExamples);
+	//fprintf (stderr, "r.shape = (%d, %d, %d, %d)\n", r.shape (0), r.shape (1), r.shape (2), r.shape (3));
+	//fprintf (stderr, "nbExamples = %d\n", nbExamples);
 	if (!loaded) {
 	  memcpy (historyBoard [0], board.board, MaxSize);
 	  init_all_moves ();
@@ -188,7 +188,7 @@ PYBIND11_MODULE(golois, m) {
 	  }
 	  FILE * fp = fopen ("validation.data", "r");
 	  if (fp == NULL) {
-	    fprintf (stderr, "generating validation.data\n");
+	    //fprintf (stderr, "generating validation.data\n");
 	    for (ssize_t i = 0; i < nbExamples; i++) {
 	      // choose a random state
 	      int pos = (int) (((float)rand () / (RAND_MAX + 1.0)) * nbPositionsSGF);
