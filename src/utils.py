@@ -22,7 +22,7 @@ class DotDict(dict):
 
 configs = DotDict({ 'n_planes' : 31,
                     'n_moves'  : 361,
-                    'n_samples': 10_000,
+                    'n_samples': 25_000,
                     'dim'      : 19 ,
                     'n_epochs'      : 650,
                     'batch_size'    : 256 ,
