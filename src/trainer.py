@@ -64,7 +64,9 @@ class Trainer(object):
         # Get Validation Data
         title = Markdown(f"# Getting `validation.data`", style=self.config.succes_style)
         console.print(title)
-        golois.getValidation(input_data, policy, value, end)
+
+        for _ in track(range(100)):
+            golois.getValidation(input_data, policy, value, end)
 
         histories = {} 
         for epoch in range (1, self.config.n_epochs + 1):

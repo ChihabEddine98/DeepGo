@@ -15,8 +15,8 @@ config = DotDict({  'n_filters'     : 64,
                     'n_res_blocks'  : 8,
                     'l2_reg'        : 0.0001,
                     'dropout'       : 0.5,
-                    'n_btnk_blocks' : 8,
-                    'squeeze'       : 64,
+                    'n_btnk_blocks' : 6,
+                    'squeeze'       : 16,
                 })
 
 BlockArgs = collections.namedtuple('BlockArgs', [
@@ -60,9 +60,10 @@ class DGMV2(DGM):
     def body_block(self, x, n_blocks=config.n_btnk_blocks):
         # Bottelneck Blocks
         for _ in range(self.n_btnk_blocks):
-             x = self.inception_block(x,[128,64,32,64,64,32],[1,3,5])
-        return x 
-    
+            x = self.inception_block(x,[64,48,32,32,32,64],[1,3,5])
+            x = self.se_block(x)
+        return x
+  
     def inception_block(self,x,filters,kernels):
         t1 = layers.Conv2D(filters[0],kernels[0])(x)
         t1 = self.activation(t1)
@@ -85,16 +86,16 @@ class DGMV2(DGM):
 
     def inverted_residual_block(self,x, expand=64, squeeze=16):
         block = layers.Conv2D(expand, (1,1), activation='relu')(x)
-        block = layers.DepthwiseConv2D((3,3), activation='relu')(block)
+        block = layers.DepthwiseConv2D((3,3),padding='same',activation='relu')(block)
         block = layers.Conv2D(squeeze, (1,1), activation='relu')(block)
         return layers.Add()([block, x])
 
-    def se_block(self,x, filters, squeeze_ratio=0.25):
+    def se_block(self,x, filters=192, squeeze_ratio=0.25):
         x_ = layers.GlobalAveragePooling2D()(x)
         x_ = layers.Reshape((1,1,filters))(x_)
         squeezed_filters = max(1, int(filters * squeeze_ratio))
-        x_ = layers.Conv2D(squeezed_filters , activation='relu')(x_)
-        x_ = layers.Conv2D(filters, activation='sigmoid')(x_)
+        x_ = layers.Conv2D(squeezed_filters ,1, activation='relu')(x_)
+        x_ = layers.Conv2D(filters,1, activation='sigmoid')(x_)
         return layers.Multiply()([x, x_])
     
     def mbConv_block(self,input_data, block_arg):
