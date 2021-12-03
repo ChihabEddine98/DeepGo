@@ -69,6 +69,7 @@ class Trainer(object):
             golois.getValidation(input_data, policy, value, end)
 
         histories = {} 
+        val_hist = []
         for epoch in range (1, self.config.n_epochs + 1):
             title = Markdown(f"# ----- epoch [{epoch}/{self.config.n_epochs}] -----", style=self.config.info_style)
             console.print(title)
@@ -97,10 +98,13 @@ class Trainer(object):
                                     verbose = self.config.verbose, batch_size=self.config.batch_size )
                 title = Markdown(f"# Validation : {val}", style=self.config.succes_style)
                 console.print(title)
+                val_hist.append(val)
                 self.model.save(self.model_path)
         
         title = Markdown(f"## END of Training Saving Last [DGM]...", style=self.config.succes_style)
-        with open(self.hist_path, 'wb') as f_hist:
+        histories['val_history'] = val_hist
+
+        with open(f"{self.hist_path}_fixed_LR_{self.config.lr}", 'wb') as f_hist:
             pickle.dump(histories, f_hist)
 
         return histories
