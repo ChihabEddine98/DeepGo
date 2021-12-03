@@ -17,7 +17,7 @@ if __name__ == '__main__':
     os.environ['TF_CPP_MIN_LOG_LEVEL'] = '2'
     strategy = tf.distribute.MirroredStrategy(configs.devices)
 
-    title = Markdown(f"# Start training ON {len(configs.devices)}GPU's", style=configs.info_style)
+    title = Markdown(f"# Start training ON {len(configs.devices)} GPU's", style=configs.info_style)
     console.print(title)
 
     # Build the model 
