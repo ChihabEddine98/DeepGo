@@ -6,6 +6,7 @@ from rich.markdown import Markdown
 
 
 from models.DGV2.model_v2 import DGMV2
+from models.DGV2.model_v2_1 import DGMV2_1
 from trainer import Trainer
 from utils import configs
 
@@ -21,7 +22,7 @@ if __name__ == '__main__':
 
     # Build the model 
     with strategy.scope():
-        dgm = DGMV2() 
+        dgm = DGMV2_1() 
         model = dgm.build_model()
         dgm.summary()
 
