@@ -10,13 +10,13 @@ from models.DGV0.model_v0 import DGM
 # end imports
 
 
-config = DotDict({  'n_filters'     : 256,
+config = DotDict({  'n_filters'     : 64,
                     'kernel'        : 5,
                     'n_res_blocks'  : 8,
                     'l2_reg'        : 0.0001,
                     'dropout'       : 0.5,
                     'n_btnk_blocks' : 8,
-                    'squeeze'       : 256,
+                    'squeeze'       : 64,
                 })
 
 BlockArgs = collections.namedtuple('BlockArgs', [
