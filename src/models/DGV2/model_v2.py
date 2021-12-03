@@ -15,7 +15,7 @@ config = DotDict({  'n_filters'     : 64,
                     'n_res_blocks'  : 8,
                     'l2_reg'        : 0.0001,
                     'dropout'       : 0.5,
-                    'n_btnk_blocks' : 6,
+                    'n_btnk_blocks' : 10,
                     'squeeze'       : 16,
                 })
 
@@ -60,8 +60,8 @@ class DGMV2(DGM):
     def body_block(self, x, n_blocks=config.n_btnk_blocks):
         # Bottelneck Blocks
         for _ in range(self.n_btnk_blocks):
-            x = self.inception_block(x,[64,48,32,32,32,64],[1,3,5])
-            x = self.se_block(x)
+            x = self.inception_block(x,[64,48,32,32,48,64],[1,3,5])
+            #x = self.se_block(x)
         return x
   
     def inception_block(self,x,filters,kernels):
