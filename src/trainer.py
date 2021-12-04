@@ -82,8 +82,10 @@ class Trainer(object):
                 if epoch < 400 : 
                      lr = 0.0007
                 elif epoch >= 400 and epoch < 450  :
+                     lr = 0.0005
+                elif epoch >= 450 and epoch < 520 :
                      lr = 0.0003
-                elif epoch >= 450 and epoch < 550 :
+                elif epoch >= 520 and epoch < 560:
                      lr = 0.0002
                 else :
                      lr = 0.000125 
@@ -109,12 +111,12 @@ class Trainer(object):
                 title = Markdown(f"# Validation : {val}", style=self.config.succes_style)
                 console.print(title)
                 val_hist.append(val)
-                self.model.save(f"5RL_{self.model_path}")       
+                self.model.save(f"5LR_89_{self.model_path}")       
         title = Markdown(f"## END of Training Saving Last [DGM]...", style=self.config.succes_style)
         console.print(title)
         histories['val_history'] = val_hist
 
-        with open(f"{self.hist_path}_5LR", 'wb') as f_hist:
+        with open(f"{self.hist_path}_5LR_89", 'wb') as f_hist:
             pickle.dump(histories, f_hist)
 
         return histories

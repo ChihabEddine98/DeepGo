@@ -66,7 +66,7 @@ class DGMV2_1(DGM):
         return x
 
     def se_block(self,in_block, ch, ratio=16):
-        x = layers.Dropout(0.2)(in_block)
+        x = layers.Dropout(self.dropout)(in_block)
         x = layers.GlobalAveragePooling2D()(x)
         x = layers.Dense(ch//ratio, activation='relu')(x)
         x = layers.Dense(ch, activation='sigmoid')(x)
@@ -85,7 +85,7 @@ class DGMV2_1(DGM):
 
     def output_value_block(self,x):
         value_head = layers.GlobalAveragePooling2D()(x)
-        value_head = layers.Dense(72, kernel_regularizer=self.l2_reg)(value_head)
+        value_head = layers.Dense(64, kernel_regularizer=self.l2_reg)(value_head)
         value_head = self.activation(value_head)
         value_head = layers.BatchNormalization()(value_head)
         value_head = layers.Dropout(self.dropout)(value_head)
@@ -93,4 +93,4 @@ class DGMV2_1(DGM):
         return value_head
     
     def activation(self, x):
-        return x * nn.relu6(x+3) * 0.166666666667 
+        return nn.swish(x) 
