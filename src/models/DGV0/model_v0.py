@@ -79,7 +79,7 @@ class DGM(object):
         self.model = Model(inputs=inp, outputs=[policy_head, value_head])
 
         self.model.compile(
-                optimizer=Adam(lr=configs.lr),
+                optimizer = Adam(lr=configs.lr),
                 loss={'policy': 'categorical_crossentropy', 'value': 'binary_crossentropy'},
                 loss_weights={'policy' : configs.policy_w, 'value' : configs.value_w},
                 metrics={'policy': 'categorical_accuracy', 'value': 'mse'})
