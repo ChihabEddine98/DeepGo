@@ -76,13 +76,17 @@ class Trainer(object):
             #print (f' Epoch [{epoch}/{self.config.n_epochs}]')
             golois.getBatch(input_data, policy, value, end, groups, epoch*self.config.n_samples)
             #with tf.device(self.config.device):
-            if self.config.annealing and epoch >= 350:
+            if self.config.annealing and epoch >= 320:
                 #lr = cosine_annealing(epoch, self.config.n_epochs, self.config.n_cycles, self.config.lr)
                 lr = K.eval(self.model.optimizer.lr) 
                 if epoch < 400 : 
-                   lr = 0.0003
+                     lr = 0.0007
+                elif epoch >= 400 and epoch < 450  :
+                     lr = 0.0003
+                elif epoch >= 450 and epoch < 550 :
+                     lr = 0.0002
                 else :
-                   lr = 0.0001
+                     lr = 0.000125 
                 
                 title = Markdown(f'# [LR-Cosine] Old Learning Rate : `{K.eval(self.model.optimizer.lr):.7f}` ==> New Learning Rate : `{lr:.7f}` ', self.config.info_style)
                 console.print(title)
@@ -105,12 +109,12 @@ class Trainer(object):
                 title = Markdown(f"# Validation : {val}", style=self.config.succes_style)
                 console.print(title)
                 val_hist.append(val)
-                self.model.save(f"3RL_{self.model_path}")       
+                self.model.save(f"5RL_{self.model_path}")       
         title = Markdown(f"## END of Training Saving Last [DGM]...", style=self.config.succes_style)
         console.print(title)
         histories['val_history'] = val_hist
 
-        with open(f"{self.hist_path}_3LR", 'wb') as f_hist:
+        with open(f"{self.hist_path}_5LR", 'wb') as f_hist:
             pickle.dump(histories, f_hist)
 
         return histories
