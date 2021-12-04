@@ -10,7 +10,7 @@ from models.DGV0.model_v0 import DGM
 
 
 
-config = DotDict({  'n_filters'     : 89,
+config = DotDict({  'n_filters'     : 90,
                     'kernel'        : 3,
                     'n_res_blocks'  : 6,
                     'l2_reg'        : 0.0001,
@@ -30,9 +30,9 @@ config = DotDict({  'n_filters'     : 89,
 class DGMV2_1(DGM):
     
     def __init__(self,version=3,n_filters=config.n_filters,kernel_size=config.kernel,l2_reg=config.l2_reg
-                ,dropout=config.dropout) -> None:
+                ,dropout=config.dropout,n_res_blocks=config.n_res_blocks) -> None:
         super().__init__(version=version,n_filters=n_filters,kernel_size=kernel_size,
-                        l2_reg=l2_reg,dropout=dropout,n_res_blocks=config.n_res_blocks)
+                        l2_reg=l2_reg,dropout=dropout,n_res_blocks=n_res_blocks)
 
     def input_block(self,inp,kernel_resize=5,pad='same'):
         # CONV2D + BN + activation 
@@ -71,6 +71,9 @@ class DGMV2_1(DGM):
         x = layers.Dense(ch//ratio, activation='relu')(x)
         x = layers.Dense(ch, activation='sigmoid')(x)
         return layers.Multiply()([in_block, x])
+
+    def build_model(self,n_blocks=config.n_res_blocks):
+        return super().build_model(n_blocks)
     
     def output_policy_block(self,x):
         policy_head = layers.Conv2D(1, 1, padding='same', use_bias=0, kernel_regularizer=self.l2_reg)(x)
@@ -90,4 +93,4 @@ class DGMV2_1(DGM):
         return value_head
     
     def activation(self, x):
-        return x * nn.relu6(x+3) * 0.166666666667
+        return nn.swish(x) 
