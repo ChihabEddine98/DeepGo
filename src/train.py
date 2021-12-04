@@ -23,7 +23,7 @@ if __name__ == '__main__':
     # Build the model 
     with strategy.scope():
         dgm = DGMV2_1() 
-        model = keras.models.load_model('model_478.h5')
+        model = keras.models.load_model('5LR_89_2_DGMV3.h5')
         dgm.model = model
         dgm.summary()
 
