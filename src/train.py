@@ -1,6 +1,6 @@
 import os 
 import tensorflow as tf
-
+import tensorflow.keras as keras
 from rich.console import Console
 from rich.markdown import Markdown
 
@@ -23,7 +23,8 @@ if __name__ == '__main__':
     # Build the model 
     with strategy.scope():
         dgm = DGMV2_1() 
-        model = dgm.build_model()
+        model = keras.models.load_model('model_478.h5')
+        dgm.model = model
         dgm.summary()
 
     # Get Trainer

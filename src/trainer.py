@@ -70,6 +70,7 @@ class Trainer(object):
 
         histories = {} 
         val_hist = []
+        K.set_value(self.model.optimizer.lr, self.config.lr)
         for epoch in range (1, self.config.n_epochs + 1):
             title = Markdown(f"## ----- epoch [{epoch}/{self.config.n_epochs}] -----", style=self.config.info_style)
             console.print(title)
@@ -111,12 +112,12 @@ class Trainer(object):
                 title = Markdown(f"# Validation : {val}", style=self.config.succes_style)
                 console.print(title)
                 val_hist.append(val)
-                self.model.save(f"5LR_89_{self.model_path}")       
+                self.model.save(f"5LR_89_2_{self.model_path}")       
         title = Markdown(f"## END of Training Saving Last [DGM]...", style=self.config.succes_style)
         console.print(title)
         histories['val_history'] = val_hist
 
-        with open(f"{self.hist_path}_5LR_89", 'wb') as f_hist:
+        with open(f"{self.hist_path}_5LR_89_2", 'wb') as f_hist:
             pickle.dump(histories, f_hist)
 
         return histories
