@@ -71,13 +71,19 @@ class Trainer(object):
         histories = {} 
         val_hist = []
         for epoch in range (1, self.config.n_epochs + 1):
-            title = Markdown(f"# ----- epoch [{epoch}/{self.config.n_epochs}] -----", style=self.config.info_style)
+            title = Markdown(f"## ----- epoch [{epoch}/{self.config.n_epochs}] -----", style=self.config.info_style)
             console.print(title)
             #print (f' Epoch [{epoch}/{self.config.n_epochs}]')
             golois.getBatch(input_data, policy, value, end, groups, epoch*self.config.n_samples)
             #with tf.device(self.config.device):
-            if self.config.annealing :
-                lr = cosine_annealing(epoch, self.config.n_epochs, self.config.n_cycles, self.config.lr)
+            if self.config.annealing and epoch >= 350:
+                #lr = cosine_annealing(epoch, self.config.n_epochs, self.config.n_cycles, self.config.lr)
+                lr = K.eval(self.model.optimizer.lr) 
+                if epoch < 400 : 
+                   lr = 0.0003
+                else :
+                   lr = 0.0001
+                
                 title = Markdown(f'# [LR-Cosine] Old Learning Rate : `{K.eval(self.model.optimizer.lr):.7f}` ==> New Learning Rate : `{lr:.7f}` ', self.config.info_style)
                 console.print(title)
                 K.set_value(self.model.optimizer.lr, lr)
@@ -99,12 +105,12 @@ class Trainer(object):
                 title = Markdown(f"# Validation : {val}", style=self.config.succes_style)
                 console.print(title)
                 val_hist.append(val)
-                self.model.save(self.model_path)
-        
+                self.model.save(f"3RL_{self.model_path}")       
         title = Markdown(f"## END of Training Saving Last [DGM]...", style=self.config.succes_style)
+        console.print(title)
         histories['val_history'] = val_hist
 
-        with open(f"{self.hist_path}_fixed_LR_{self.config.lr}", 'wb') as f_hist:
+        with open(f"{self.hist_path}_3LR", 'wb') as f_hist:
             pickle.dump(histories, f_hist)
 
         return histories
