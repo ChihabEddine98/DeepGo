@@ -17,10 +17,17 @@ from dataloader import DataHandler
 
 
 # calculate learning rate for an epoch
-def cosine_annealing(epoch, n_epochs, n_cycles, lr_max):
+'''
+def cosine_annealing(epoch, n_epochs,n_steps, n_cycles, lr_max):
     epochs_per_cycle = floor(n_epochs/n_cycles)
-    cos_inner = (pi * (epoch % epochs_per_cycle)) / (epochs_per_cycle)
+    cos_inner = (pi * (epoch % epochs_per_cycle)) / (n_steps* epochs_per_cycle)
     return lr_max / 2 * (cos(cos_inner) + 1)
+'''
+def cosine_annealing(epoch,lr_min,lr_max,n_epochs,n_steps, n_cycles):
+    epochs_per_cycle = floor(n_epochs/n_cycles)
+    cos_inner = (pi * (epoch % epochs_per_cycle)) / (n_steps* epochs_per_cycle)
+    lr = lr_min + 0.5 * (lr_max - lr_min) * (1 + cos(cos_inner))
+    return lr
 
 class Scheduler(Callback):
 	# constructor
