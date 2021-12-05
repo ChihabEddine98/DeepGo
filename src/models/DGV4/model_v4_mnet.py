@@ -44,11 +44,10 @@ class DGMV5(DGM):
         self.repetitions = config.repetitions
         self.groups = config.groups
         self.channels = n_filters
-        self.squeeze = config.squeeze
 
     def build_model(self,n_blocks=config.n_btk_blocks):
         return super().build_model(n_blocks)
-
+    
     def input_block(self,inp,kernel_resize=5,pad='same'):
         # CONV2D + BN + activation 
         x = layers.Conv2D(self.squeeze, 3, padding=pad)(inp)
@@ -63,7 +62,7 @@ class DGMV5(DGM):
         x = layers.add([x, x1])
         
         return x
-
+    
     def body_block(self,x,n_blocks=config.n_btk_blocks):
         for _ in range(n_blocks):
             x = self.bottleneck_block(x)
@@ -73,7 +72,7 @@ class DGMV5(DGM):
         m = layers.Conv2D(self.n_filters,1, kernel_regularizer=self.l2_reg,use_bias=0)(x)
         m = layers.BatchNormalization()(m)
         m = self.activation(m)
-
+      
         m = layers.DepthwiseConv2D(self.kernel, padding='same',kernel_regularizer=self.l2_reg,use_bias=0)(m)
         m = layers.BatchNormalization()(m)
         m = self.activation(m)
