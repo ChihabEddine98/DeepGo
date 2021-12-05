@@ -25,7 +25,8 @@ if __name__ == '__main__':
     with strategy.scope():
         dgm = DGMV4() 
         #model = keras.models.load_model('5LR_89_2_DGMV3.h5')
-        #dgm.model = model
+        model = dgm.build_model() 
+        dgm.model = model
         dgm.summary()
 
     # Get Trainer
