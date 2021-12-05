@@ -56,7 +56,7 @@ class DGMV4(DGM):
         x1 = self.spatial_attention_module(x1)
 
 
-        x = layers.add()([x1, x])
+        x = layers.add([x1, x])
         x = self.activation(x)
         x = layers.BatchNormalization()(x)
 
@@ -77,7 +77,7 @@ class DGMV4(DGM):
 
         add_x = layers.add([maxp, avgp])
         activ_x = layers.Activation('sigmoid')(add_x)
-        return layers.Multiply()([in_block, activ_x])
+        return layers.multiply([in_block, activ_x])
 
     def spatial_attention_module(self,in_block):
         maxp = layers.Lambda(lambda x: K.mean(x, axis=3, keepdims=True))(in_block)
@@ -88,7 +88,7 @@ class DGMV4(DGM):
         conv_x = layers.Conv2D(1, (7, 7), padding='same')(max_avg)
 
         activ_x = layers.Activation('sigmoid')(conv_x)
-        return layers.Multiply()([in_block, activ_x])
+        return layers.multiply([in_block, activ_x])
     
     
     def activation(self, x):
