@@ -44,6 +44,7 @@ class DGMV5(DGM):
         self.repetitions = config.repetitions
         self.groups = config.groups
         self.channels = n_filters
+        self.squeeze = config.squeeze
 
     def build_model(self,n_blocks=config.n_btk_blocks):
         return super().build_model(n_blocks)
