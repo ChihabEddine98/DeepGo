@@ -14,7 +14,7 @@ from models.DGV0.model_v0 import DGM
 config = DotDict({  'n_filters'     : 90,
                     'kernel'        : 3,
                     'n_res_blocks'  : 6,
-                    'n_cbam_blocks' : 12,
+                    'n_cbam_blocks' : 8,
                     'l2_reg'        : 0.0001,
                     'dropout'       : 0.2,
                 })
@@ -35,6 +35,8 @@ class DGMV4(DGM):
                 ,dropout=config.dropout) -> None:
         super().__init__(version=version,n_filters=n_filters,kernel_size=kernel_size,
                         l2_reg=l2_reg,dropout=dropout,n_res_blocks=config.n_res_blocks)
+                
+        self.n_cbam_blocks = config.n_cbam_blocks
 
     def body_block(self,x,n_blocks=config.n_cbam_blocks):
         # CBAM Blocks 
@@ -51,13 +53,10 @@ class DGMV4(DGM):
         x1 = layers.BatchNormalization()(x1)
 
         x1 = self.channel_attention_module(x1, self.n_filters, ratio=4)
+        x1 = self.spatial_attention_module(x1)
 
-        x = layers.Multiply()([x1, x])
-        x = self.activation(x)
-        x = layers.BatchNormalization()(x)
 
-        x2 = self.spatial_attention_module(x)
-        x = layers.Multiply()([x2, x])
+        x = layers.add()([x1, x])
         x = self.activation(x)
         x = layers.BatchNormalization()(x)
 
