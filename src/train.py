@@ -8,6 +8,7 @@ from rich.markdown import Markdown
 from models.DGV2.model_v2 import DGMV2
 from models.DGV2.model_v2_1 import DGMV2_1
 from models.DGV4.model_v4 import DGMV4
+from models.DGV4.model_v4_shufflnet import DGMV5
 from trainer import Trainer
 from utils import configs
 
@@ -23,7 +24,7 @@ if __name__ == '__main__':
 
     # Build the model 
     with strategy.scope():
-        dgm = DGMV4() 
+        dgm = DGMV5() 
         #model = keras.models.load_model('5LR_89_2_DGMV3.h5')
         model = dgm.build_model() 
         dgm.model = model
