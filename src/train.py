@@ -8,7 +8,7 @@ from rich.markdown import Markdown
 from models.DGV2.model_v2 import DGMV2
 from models.DGV2.model_v2_1 import DGMV2_1
 from models.DGV4.model_v4 import DGMV4
-from models.DGV4.model_v4_shufflnet import DGMV5
+from models.DGV4.model_v4_mnet import DGMV5
 from trainer import Trainer
 from utils import configs
 
