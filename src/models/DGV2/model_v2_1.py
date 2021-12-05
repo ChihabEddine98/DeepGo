@@ -60,7 +60,7 @@ class DGMV2_1(DGM):
         x1 = self.se_block(x1, self.n_filters, ratio=4)
 
         x = layers.add([x1, x])
-        x1 = self.activation(x1)
+        x = self.activation(x)
         x = layers.BatchNormalization()(x)
 
         return x
