@@ -18,7 +18,7 @@ config = DotDict({  'n_filters'     : 64,
                     'kernel'        : 3,
                     'n_res_blocks'  : 6,
                     'l2_reg'        : 0.0001,
-                    'dropout' : 0.4
+                    'dropout' : 0.2
                 })
 
 
