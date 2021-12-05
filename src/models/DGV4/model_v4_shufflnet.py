@@ -49,7 +49,7 @@ class DGMV5(DGM):
             x = self.shufflenet_block(x, channels=self.channels, strides=1, groups=self.groups)
         return x
 
-    def channel_shuffle(x, groups):  
+    def channel_shuffle(self,x, groups):  
         _, width, height, channels = x.get_shape().as_list()
         group_ch = channels // groups
 
