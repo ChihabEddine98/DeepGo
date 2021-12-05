@@ -11,7 +11,7 @@ from models.DGV0.model_v0 import DGM
 
 
 
-config = DotDict({  'n_filters'     : 90,
+config = DotDict({  'n_filters'     : 92,
                     'kernel'        : 3,
                     'n_res_blocks'  : 6,
                     'n_cbam_blocks' : 8,
@@ -34,7 +34,7 @@ class DGMV4(DGM):
     def __init__(self,version=4,n_filters=config.n_filters,kernel_size=config.kernel,l2_reg=config.l2_reg
                 ,dropout=config.dropout) -> None:
         super().__init__(version=version,n_filters=n_filters,kernel_size=kernel_size,
-                        l2_reg=l2_reg,dropout=dropout,n_res_blocks=config.n_res_blocks)
+                        l2_reg=l2_reg,dropout=dropout,n_res_blocks=config.n_cbam_blocks)
                 
         self.n_cbam_blocks = config.n_cbam_blocks
 

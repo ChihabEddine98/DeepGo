@@ -77,17 +77,23 @@ class Trainer(object):
             #print (f' Epoch [{epoch}/{self.config.n_epochs}]')
             golois.getBatch(input_data, policy, value, end, groups, epoch*self.config.n_samples)
             #with tf.device(self.config.device):
-            if self.config.annealing and epoch >= 320:
+            if self.config.annealing and epoch >= 270:
                 #lr = cosine_annealing(epoch, self.config.n_epochs, self.config.n_cycles, self.config.lr)
                 lr = K.eval(self.model.optimizer.lr) 
-                if epoch < 400 : 
-                     lr = 0.0007
-                elif epoch >= 400 and epoch < 450  :
+                if epoch < 320 : 
+                     lr = 0.003
+                elif epoch >= 320 and epoch < 380  :
+                     lr = 0.001
+                elif epoch >= 380 and epoch < 420 :
+                     lr = 0.0009
+                elif epoch >= 420 and epoch < 500:
+                     lr = 0.00075
+                elif epoch >= 500 and epoch < 570:
                      lr = 0.0005
-                elif epoch >= 450 and epoch < 520 :
-                     lr = 0.0003
-                elif epoch >= 520 and epoch < 560:
-                     lr = 0.0002
+                elif epoch >= 570 and epoch < 620:
+                     lr = 0.00035
+                elif epoch >= 620 and epoch < 670:
+                     lr = 0.0002   
                 else :
                      lr = 0.000125 
                 
