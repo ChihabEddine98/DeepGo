@@ -23,9 +23,9 @@ def cosine_annealing(epoch, n_epochs,n_steps, n_cycles, lr_max):
     cos_inner = (pi * (epoch % epochs_per_cycle)) / (n_steps* epochs_per_cycle)
     return lr_max / 2 * (cos(cos_inner) + 1)
 '''
-def cosine_annealing(epoch,lr_min,lr_max,n_epochs,n_steps, n_cycles):
+def cosine_annealing(epoch,lr_min,lr_max,n_epochs, n_cycles):
     epochs_per_cycle = floor(n_epochs/n_cycles)
-    cos_inner = (pi * (epoch % epochs_per_cycle)) / (n_steps* epochs_per_cycle)
+    cos_inner = (pi * (epoch % epochs_per_cycle)) / (epochs_per_cycle)
     lr = lr_min + 0.5 * (lr_max - lr_min) * (1 + cos(cos_inner))
     return lr
 
@@ -87,7 +87,7 @@ class Trainer(object):
             if self.config.annealing:
                 lr = cosine_annealing(epoch=epoch,lr_min=self.config.lr_min,
                                       lr_max=self.config.lr,n_epochs=self.config.n_epochs,
-                                      n_steps=self.config.n_steps,n_cycles=self.config.n_cycles)
+                                      n_cycles=self.config.n_cycles)
                 #lr = K.eval(self.model.optimizer.lr) 
                 ''' if epoch < 320 : 
                      lr = 0.003
