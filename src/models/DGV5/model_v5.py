@@ -17,7 +17,7 @@ config = DotDict({  'n_filters'     : 64,
                     'n_res_blocks'  : 8,
                     'l2_reg'        : 0.0001,
                     'dropout'       : 0.5,
-                    'n_btnk_blocks' : 10,
+                    'n_btnk_blocks' : 12,
                     'squeeze'       : 16,
                 })
 
@@ -62,8 +62,8 @@ class DGMV2(DGM):
     def body_block(self, x, n_blocks=config.n_btnk_blocks):
         # Bottelneck Blocks
         for _ in range(self.n_btnk_blocks):
-            x = self.inception_block(x,[64,48,32,32,48,64],[1,3,5])
-            #x = self.se_block(x)
+            x = self.inception_block(x,[64,32,16,32,32,64],[1,3,5])
+            x = self.se_block(x)
         return x
   
     def inception_block(self,x,filters,kernels):
@@ -92,7 +92,7 @@ class DGMV2(DGM):
         block = layers.Conv2D(squeeze, (1,1), activation='relu')(block)
         return layers.Add()([block, x])
 
-    def se_block(self,x, filters=192, squeeze_ratio=0.25):
+    def se_block(self,x, filters=176, squeeze_ratio=0.25):
         x_ = layers.GlobalAveragePooling2D()(x)
         x_ = layers.Reshape((1,1,filters))(x_)
         squeezed_filters = max(1, int(filters * squeeze_ratio))
