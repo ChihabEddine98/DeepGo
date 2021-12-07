@@ -51,7 +51,7 @@ class DGMV5(DGM):
     
     def input_block(self,inp,kernel_resize=5,pad='same'):
         # CONV2D + BN + activation 
-        x = layers.Conv2D(self.squeeze, 3, padding=pad)(inp)
+        x = layers.Conv2D(self.squeeze, 1, padding=pad)(inp)
         x = layers.BatchNormalization()(x)
         x = self.activation(x)
         

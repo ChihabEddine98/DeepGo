@@ -85,27 +85,39 @@ class Trainer(object):
             golois.getBatch(input_data, policy, value, end, groups, epoch*self.config.n_samples)
             #with tf.device(self.config.device):
             if self.config.annealing:
-                lr = cosine_annealing(epoch=epoch,lr_min=self.config.lr_min,
+                #lr = cosine_annealing(epoch=epoch,lr_min=self.config.lr_min,
                                       lr_max=self.config.lr,n_epochs=self.config.n_epochs,
                                       n_cycles=self.config.n_cycles)
-                #lr = K.eval(self.model.optimizer.lr) 
-                ''' if epoch < 320 : 
-                     lr = 0.003
-                elif epoch >= 320 and epoch < 380  :
-                     lr = 0.001
-                elif epoch >= 380 and epoch < 420 :
-                     lr = 0.0009
-                elif epoch >= 420 and epoch < 500:
-                     lr = 0.00075
-                elif epoch >= 500 and epoch < 570:
-                     lr = 0.0005
-                elif epoch >= 570 and epoch < 620:
-                     lr = 0.00035
-                elif epoch >= 620 and epoch < 670:
-                     lr = 0.0002   
-                else :
-                     lr = 0.000125 
-                '''
+                lr = K.eval(self.model.optimizer.lr) 
+                if epoch < 200 : 
+                     lr = 0.005
+                elif epoch >= 200 and epoch < 250  :
+                     lr = 0.002
+                elif epoch >= 250 and epoch < 320 :
+                     lr = 0.00125
+                elif epoch >= 320 and epoch < 370:
+                     lr = 0.000725
+                elif epoch >= 370 and epoch < 400:
+                     lr = 0.000525
+                elif epoch >= 400 and epoch < 440:
+                     lr = 0.000375
+                elif epoch >= 440 and epoch < 470:
+                     lr = 0.00025
+                elif epoch >= 470 and epoch < 520:
+                     lr = 0.000125
+                elif epoch >= 520 and epoch < 560:
+                     lr = 0.0000975 
+                elif epoch >= 560 and epoch < 590:
+                     lr = 0.0000875
+                elif epoch >= 590 and epoch < 630:
+                     lr = 0.0000725
+                elif epoch >= 630 and epoch < 670:
+                     lr = 0.0000525
+                elif epoch >= 670 and epoch < 700:
+                     lr = 0.0000325
+	        else :
+                     lr = 0.0000125 
+                
                 title = Markdown(f'# [LR-Cosine] Old Learning Rate : `{K.eval(self.model.optimizer.lr):.7f}` ==> New Learning Rate : `{lr:.7f}` ', self.config.info_style)
                 console.print(title)
                 K.set_value(self.model.optimizer.lr, lr)
