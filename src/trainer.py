@@ -85,27 +85,27 @@ class Trainer(object):
             golois.getBatch(input_data, policy, value, end, groups, epoch*self.config.n_samples)
             #with tf.device(self.config.device):
             if self.config.annealing:
-                lr = cosine_annealing(epoch=epoch,lr_min=self.config.lr_min,
-                                      lr_max=self.config.lr,n_epochs=self.config.n_epochs,
-                                      n_cycles=self.config.n_cycles)
+               # lr = cosine_annealing(epoch=epoch,lr_min=self.config.lr_min,
+                #                      lr_max=self.config.lr,n_epochs=self.config.n_epochs,
+                 #                     n_cycles=self.config.n_cycles)
                 #lr = K.eval(self.model.optimizer.lr) 
-                ''' if epoch < 320 : 
-                     lr = 0.003
-                elif epoch >= 320 and epoch < 380  :
+                if epoch < 150 : 
+                     lr = 0.005
+                elif epoch >= 150 and epoch < 230  :
                      lr = 0.001
-                elif epoch >= 380 and epoch < 420 :
+                elif epoch >= 230 and epoch < 280 :
                      lr = 0.0009
-                elif epoch >= 420 and epoch < 500:
+                elif epoch >= 280 and epoch < 320:
                      lr = 0.00075
-                elif epoch >= 500 and epoch < 570:
+                elif epoch >= 320 and epoch < 370:
                      lr = 0.0005
-                elif epoch >= 570 and epoch < 620:
+                elif epoch >= 370 and epoch < 420:
                      lr = 0.00035
-                elif epoch >= 620 and epoch < 670:
+                elif epoch >= 420 and epoch < 470:
                      lr = 0.0002   
                 else :
-                     lr = 0.000125 
-                '''
+                     lr = 0.0000375 
+                
                 title = Markdown(f'# [LR-Cosine] Old Learning Rate : `{K.eval(self.model.optimizer.lr):.7f}` ==> New Learning Rate : `{lr:.7f}` ', self.config.info_style)
                 console.print(title)
                 K.set_value(self.model.optimizer.lr, lr)
