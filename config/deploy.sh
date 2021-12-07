@@ -115,9 +115,11 @@ sudo mv cuda-ubuntu2004.pin /etc/apt/preferences.d/cuda-repository-pin-600
 sudo apt-key adv --fetch-keys https://developer.download.nvidia.com/compute/cuda/repos/ubuntu2004/x86_64/7fa2af80.pub
 sudo add-apt-repository "deb https://developer.download.nvidia.com/compute/cuda/repos/ubuntu2004/x86_64/ /"
 sudo apt-get update
+sudo apt-get install libcudnn8=8.1.0.*-1+cuda11.2
+sudo apt-get install libcudnn8-dev=8.1.0.*-1+cuda11.2
 # Take about ~ 2 min 
-sudo apt-get install libcudnn8=${cudnn_version}-1+${cuda_version} # cudnn_version  = 8.1.0.* , cuda_version cuda11.2
-sudo apt-get install libcudnn8-dev=${cudnn_version}-1+${cuda_version}
+#sudo apt-get install libcudnn8=${cudnn_version}-1+${cuda_version} # cudnn_version  = 8.1.0.* , cuda_version cuda11.2
+#sudo apt-get install libcudnn8-dev=${cudnn_version}-1+${cuda_version}
 
 # Check GPU with TF
 # from tensorflow.python.client import device_lib 

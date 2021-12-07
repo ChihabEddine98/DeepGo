@@ -85,6 +85,7 @@ class Trainer(object):
             golois.getBatch(input_data, policy, value, end, groups, epoch*self.config.n_samples)
             #with tf.device(self.config.device):
             if self.config.annealing:
+<<<<<<< HEAD
                 #lr = cosine_annealing(epoch=epoch,lr_min=self.config.lr_min,
                                       lr_max=self.config.lr,n_epochs=self.config.n_epochs,
                                       n_cycles=self.config.n_cycles)
@@ -117,6 +118,28 @@ class Trainer(object):
                      lr = 0.0000325
 	        else :
                      lr = 0.0000125 
+=======
+               # lr = cosine_annealing(epoch=epoch,lr_min=self.config.lr_min,
+                #                      lr_max=self.config.lr,n_epochs=self.config.n_epochs,
+                 #                     n_cycles=self.config.n_cycles)
+                #lr = K.eval(self.model.optimizer.lr) 
+                if epoch < 150 : 
+                     lr = 0.005
+                elif epoch >= 150 and epoch < 230  :
+                     lr = 0.001
+                elif epoch >= 230 and epoch < 280 :
+                     lr = 0.0009
+                elif epoch >= 280 and epoch < 320:
+                     lr = 0.00075
+                elif epoch >= 320 and epoch < 370:
+                     lr = 0.0005
+                elif epoch >= 370 and epoch < 420:
+                     lr = 0.00035
+                elif epoch >= 420 and epoch < 470:
+                     lr = 0.0002   
+                else :
+                     lr = 0.0000375 
+>>>>>>> e6c500239f56083e26c4121997fef747ecb23919
                 
                 title = Markdown(f'# [LR-Cosine] Old Learning Rate : `{K.eval(self.model.optimizer.lr):.7f}` ==> New Learning Rate : `{lr:.7f}` ', self.config.info_style)
                 console.print(title)

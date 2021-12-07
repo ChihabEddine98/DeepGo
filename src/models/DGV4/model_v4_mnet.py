@@ -111,4 +111,4 @@ class DGMV5(DGM):
         return layers.multiply([in_block, activ_x])
 
     def activation(self, x):
-        return nn.swish(x)
+        return x * nn.relu6(x+3) * 0.166666666667

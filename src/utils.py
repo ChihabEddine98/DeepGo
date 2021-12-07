@@ -39,7 +39,10 @@ configs = DotDict({ 'n_planes' : 31,
                     'save_format'   : 'h5',
                     'devices_g5000'       : ['/device:GPU:0','/device:GPU:1','/device:GPU:2','/device:GPU:3',
                                        '/device:GPU:4','/device:GPU:5','/device:GPU:6','/device:GPU:7'],
+<<<<<<< HEAD
                     'devices'       : ['/device:GPU:0','/device:GPU:1'],
+=======
+>>>>>>> e6c500239f56083e26c4121997fef747ecb23919
                     'n_cycles'      : 10,
                     'annealing'     : 1,
                     'info_style'    : "bold yellow",
