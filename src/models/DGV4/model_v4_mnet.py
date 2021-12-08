@@ -79,8 +79,8 @@ class DGMV5(DGM):
         m = self.activation(m)
 
         #m = layers.Dropout(self.dropout)(m)
-        #m = self.sub_residual_block(m)
-        m = self.channel_attention_module(m, self.n_filters, ratio=8)
+        m = self.sub_residual_block(m,ratio=16)
+        m = self.channel_attention_module(m, self.n_filters, ratio=32)
 
         m = layers.Conv2D(self.squeeze, 1,kernel_regularizer=self.l2_reg,use_bias=0)(m)
         m = layers.BatchNormalization()(m)
@@ -111,4 +111,4 @@ class DGMV5(DGM):
         return layers.multiply([in_block, activ_x])
 
     def activation(self, x):
-        return x * nn.relu6(x+3) * 0.166666666667
+        return nn.swish(x) 
