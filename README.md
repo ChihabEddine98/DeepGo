@@ -15,7 +15,7 @@ Now you need to run this container :
 - [x]  DGV0 -- ReLU/swish activation
 - [ ] try out e-swish : [here](https://arxiv.org/pdf/1801.07145.pdf)
 - [ ] try h-swish [here](https://paperswithcode.com/method/hard-swish)
-- [ ] SSH - GRID 5000
+- [x] SSH - GRID 5000
 
 
 
