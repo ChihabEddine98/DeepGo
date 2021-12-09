@@ -80,7 +80,7 @@ class DGMV5(DGM):
 
         #m = layers.Dropout(self.dropout)(m)
         m = self.sub_residual_block(m,ratio=16)
-        m = self.channel_attention_module(m, self.n_filters, ratio=32)
+        m = self.channel_attention_module(m, self.n_filters, ratio=16)
 
         m = layers.Conv2D(self.squeeze, 1,kernel_regularizer=self.l2_reg,use_bias=0)(m)
         m = layers.BatchNormalization()(m)

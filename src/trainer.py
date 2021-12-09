@@ -89,8 +89,10 @@ class Trainer(object):
                 #                      lr_max=self.config.lr,n_epochs=self.config.n_epochs,
 	        #                      n_cycles=self.config.n_cycles)
                 lr = K.eval(self.model.optimizer.lr)
-                if epoch < 150 : 
+                if   epoch < 100:
                      lr = 0.005
+                elif epoch > 100 and epoch < 150 :
+                     lr = 0.00425
                 elif epoch >= 150 and epoch < 200 :
                      lr = 0.00375
                 elif epoch >= 200 and epoch < 250  :
@@ -171,12 +173,12 @@ class Trainer(object):
                 title = Markdown(f"# Validation : {val}", style=self.config.succes_style)
                 console.print(title)
                 val_hist.append(val)
-                self.model.save(f"12LR_mnet_se_attention_64_256_16{self.model_path}_800")       
+                self.model.save(f"12LR_mnet_se_attention_64_256_16{self.model_path}_600")       
         title = Markdown(f"## END of Training Saving Last [DGM]...", style=self.config.succes_style)
         console.print(title)
         histories['val_history'] = val_hist
 
-        with open(f"{self.hist_path}_12LR_mnet_se_attention_64_256_16_800", 'wb') as f_hist:
+        with open(f"{self.hist_path}_12LR_mnet_se_attention_64_256_16_600", 'wb') as f_hist:
             pickle.dump(histories, f_hist)
 
         return histories
