@@ -173,12 +173,12 @@ class Trainer(object):
                 title = Markdown(f"# Validation : {val}", style=self.config.succes_style)
                 console.print(title)
                 val_hist.append(val)
-                self.model.save(f"12LR_mnet_se_attention_64_256_16{self.model_path}_600")       
+                self.model.save(f"12LR_mnet_se_attention_64_256_16_500{self.model_path}")       
         title = Markdown(f"## END of Training Saving Last [DGM]...", style=self.config.succes_style)
         console.print(title)
         histories['val_history'] = val_hist
 
-        with open(f"{self.hist_path}_12LR_mnet_se_attention_64_256_16_600", 'wb') as f_hist:
+        with open(f"{self.hist_path}_12LR_mnet_se_attention_64_256_16_500", 'wb') as f_hist:
             pickle.dump(histories, f_hist)
 
         return histories
