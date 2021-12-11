@@ -78,7 +78,7 @@ class Trainer(object):
         histories = {} 
         val_hist = []
         K.set_value(self.model.optimizer.lr, self.config.lr)
-        for epoch in range (1, self.config.n_epochs + 1):
+        for epoch in range (self.config.start_epoch, self.config.end_epoch + 1):
             title = Markdown(f"## ----- epoch [{epoch}/{self.config.n_epochs}] -----", style=self.config.info_style)
             console.print(title)
             #print (f' Epoch [{epoch}/{self.config.n_epochs}]')
@@ -110,7 +110,7 @@ class Trainer(object):
                 elif epoch >= 470 and epoch < 520:
                      lr = 0.000125
                 elif epoch >= 520 and epoch < 560:
-                     lr = 0.0000975 
+                     lr = 0.0000975
                 elif epoch >= 560 and epoch < 590:
                      lr = 0.0000875
                 elif epoch >= 590 and epoch < 630:
@@ -127,6 +127,8 @@ class Trainer(object):
                      lr = 0.0000325
                 elif epoch >= 800 and epoch < 830:
                      lr = 0.0000225
+                elif epoch >= 830 and epoch < 865:
+                     lr = 0.000015
                 else:
                      lr = 0.0000125
                 # lr = cosine_annealing(epoch=epoch,lr_min=self.config.lr_min,
@@ -173,12 +175,12 @@ class Trainer(object):
                 title = Markdown(f"# Validation : {val}", style=self.config.succes_style)
                 console.print(title)
                 val_hist.append(val)
-                self.model.save(f"12LR_mnet_se_attention_64_256_16_500{self.model_path}")       
+                self.model.save(f"12LR_mnet_se_attention_64_256_16_{self.config.start_epoch}_to_{self.config.end_epoch}_{self.model_path}")       
         title = Markdown(f"## END of Training Saving Last [DGM]...", style=self.config.succes_style)
         console.print(title)
         histories['val_history'] = val_hist
 
-        with open(f"{self.hist_path}_12LR_mnet_se_attention_64_256_16_500", 'wb') as f_hist:
+        with open(f"{self.hist_path}_12LR_mnet_se_attention_64_256_16_{self.config.end_epoch}", 'wb') as f_hist:
             pickle.dump(histories, f_hist)
 
         return histories
