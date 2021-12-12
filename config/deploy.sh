@@ -5,6 +5,7 @@
 ################################################
 # Reservation :
 # oarsub -p "cluster='gemini'" -l host=1,walltime=40 -t deploy -t exotic -r '2021-12-03 20:00:00'
+# oarsub -p "gpu_count > 1 AND gpu_model NOT LIKE '%Radeon%'" -l host=1,walltime=8 -t deploy -t exotic -r '2021-12-11 17:40:00'
 # This script is to run on top of Debian11-x64
 # Use this to create the deb11 : 
 # kadeploy3 -f $OAR_NODE_FILE -e debian11-x64-base -k
@@ -102,7 +103,7 @@ sh NVIDIA-Linux-x86_64-450.51.run -s --no-install-compat32-libs
 
 # heree yoohoooo ! 
 # To get Nvidia only gpu ! 
-# oarsub -p "gpu_count > 0 AND gpu_model NOT LIKE 'Radeon%'" -l host=1,walltime=2 -t deploy -t exotic -I
+# oarsub -p "gpu_count > 0 AND gpu_model NOT LIKE 'Radeon%'" -l host=1,walltime=4 -t deploy -t exotic -I
 # Use this to create the deb11 :
 # Take about ~ 7 min 
 # kadeploy3 -f $OAR_NODE_FILE -e debian11-x64-std -k
@@ -127,6 +128,7 @@ sudo apt-get install libcudnn8-dev=8.1.0.*-1+cuda11.2
 
 echo 'Configuring Repository[DeepGo]...'
 # Repository Installation
+wget https://www.lamsade.dauphine.fr/~cazenave/games.1000000.data.zip
 git clone https://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@github.com/ChihabEddine98/DeepGo.git
 cd DeepGo
 pip3 install --ignore-installed -r requirements.txt
