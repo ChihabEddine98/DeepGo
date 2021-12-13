@@ -11,6 +11,8 @@ from models.DGV2.model_v2_1 import DGMV2_1
 from models.DGV4.model_v4 import DGMV4
 from models.DGV4.model_v4_mnet import DGMV5
 from models.DGV5.model_v5 import DGMV2
+from models.DGV6.model_v6 import DGMV6
+
 from trainer import Trainer
 from utils import configs
 
@@ -30,6 +32,7 @@ def console_handler(console):
         -b    [--batch-size]    : the batch size used to train model [default : 512]
         -n    [--num-samples]   : # of samples in the get_batch per epoch [default : 25k]
         -w    [--show-warnings] : the warnings show level [from 0 to 3]
+        -l    [--load][PATH]    : load Model to continue training from [PATH]
     '''
     # Get All Arguments from Command Line 
     parser = argparse.ArgumentParser(description='Argument Parser For DGM models.')
@@ -65,14 +68,12 @@ if __name__ == '__main__':
 
     console = Console()
     strategy , args = console_handler(console)
-    print(args)
-
     title = Markdown(f"# Start training ON {len(configs.devices)} GPU's", style=configs.info_style)
     console.print(title)
 
     # Build the model 
     with strategy.scope():
-        dgm = DGMV4() 
+        dgm = DGMV6() 
         # Check if we wanna load an existing model and continue train
         if args.load != '':
             model = keras.models.load_model(args.load)
