@@ -79,7 +79,7 @@ class Trainer(object):
         val_hist = []
         K.set_value(self.model.optimizer.lr, self.config.lr)
         for epoch in range (self.config.start_epoch, self.config.end_epoch + 1):
-            title = Markdown(f"## ----- epoch [{epoch}/{self.config.n_epochs}] -----", style=self.config.info_style)
+            title = Markdown(f"## ----- epoch [{epoch}/{self.config.end_epoch}] -----", style=self.config.info_style)
             console.print(title)
             #print (f' Epoch [{epoch}/{self.config.n_epochs}]')
             golois.getBatch(input_data, policy, value, end, groups, epoch*self.config.n_samples)
@@ -175,12 +175,12 @@ class Trainer(object):
                 title = Markdown(f"# Validation : {val}", style=self.config.succes_style)
                 console.print(title)
                 val_hist.append(val)
-                self.model.save(f"12LR_mnet_se_attention_64_256_16_{self.config.start_epoch}_to_{self.config.end_epoch}_{self.model_path}")       
+                self.model.save(f"12LR_cbam_60_3_5_7_{self.config.start_epoch}_to_{self.config.end_epoch}_{self.model_path}")       
         title = Markdown(f"## END of Training Saving Last [DGM]...", style=self.config.succes_style)
         console.print(title)
         histories['val_history'] = val_hist
 
-        with open(f"{self.hist_path}_12LR_mnet_se_attention_64_256_16_{self.config.end_epoch}", 'wb') as f_hist:
+        with open(f"{self.hist_path}_12LR_cbam_60_3_5_7_{self.config.end_epoch}", 'wb') as f_hist:
             pickle.dump(histories, f_hist)
 
         return histories
