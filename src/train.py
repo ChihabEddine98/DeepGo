@@ -39,6 +39,8 @@ def console_handler(console):
     parser.add_argument('-b','--batch-size',type=int,default=512,metavar='',help="the batch size used to train model [default : 512]")
     parser.add_argument('-n','--num-samples',type=int,default=25_000,metavar='',help="# of samples in the get_batch per epoch [default : 25k]")
     parser.add_argument('-w','--show-warnings',type=int,default=2,metavar='',help="the warnings show level [from 0 to 3]")
+    parser.add_argument('-c','--continue-train',type=str,default=None,dest='',help="Model to continue training")
+
     args = parser.parse_args()
     
     # Set Parsed Parameters into configs
@@ -54,7 +56,7 @@ def console_handler(console):
 
     # Make it Parallel 🥳
     strategy = tf.distribute.MirroredStrategy(configs.devices)
-    return strategy
+    return strategy,args
 
 
 
@@ -62,7 +64,7 @@ def console_handler(console):
 if __name__ == '__main__':
 
     console = Console()
-    strategy = console_handler(console)
+    strategy , args = console_handler(console)
 
     title = Markdown(f"# Start training ON {len(configs.devices)} GPU's", style=configs.info_style)
     console.print(title)
@@ -70,8 +72,12 @@ if __name__ == '__main__':
     # Build the model 
     with strategy.scope():
         dgm = DGMV4() 
-        #model = keras.models.load_model('12LR_mnet_se_attention_64_256_16_500DGMV4.h5')
-        model = dgm.build_model() 
+        # Check if we wanna load an existing model and continue train
+        if args.continue_train is not None:
+            model = keras.models.load_model(args.continue_train)
+        else:
+            model = dgm.build_model() 
+
         dgm.model = model
         dgm.summary()
 
