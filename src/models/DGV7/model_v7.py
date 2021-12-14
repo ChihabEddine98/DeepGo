@@ -5,17 +5,17 @@ import tensorflow.nn as nn
 from tensorflow.keras import Input,Model
 from tensorflow.keras.utils import plot_model
 from tensorflow.keras import layers, regularizers,activations
-from utils import DotDict
+from utils import DotDict,configs
 from models.DGV0.model_v0 import DGM
 # end imports
 
 
-config = DotDict({  'n_filters'     : 64,
+config = DotDict({  'n_filters'     : 192,
                     'kernel'        : 5,
                     'n_res_blocks'  : 8,
                     'l2_reg'        : 0.0001,
-                    'dropout'       : 0.5,
-                    'n_inc_blocks' : 10,
+                    'dropout'       : 0.2,
+                    'n_inc_blocks'  : 14,
                     'squeeze'       : 16,
                 })
 
@@ -24,7 +24,7 @@ config = DotDict({  'n_filters'     : 64,
         DGM (DeepGoModel) : Inception Net with Squeeze & Excitation Blocks / Swish 
     -------------------------------------------------------------------------------------------
 '''
-class DGMV2(DGM):
+class DGMV8(DGM):
     
     def __init__(self,version=8,n_filters=config.n_filters,kernel_size=config.kernel,l2_reg=config.l2_reg
                 ,dropout=config.dropout,n_inc_blocks=config.n_inc_blocks,squeeze=config.squeeze) -> None:
@@ -34,73 +34,39 @@ class DGMV2(DGM):
         self.squeeze = squeeze
 
     def body_block(self, x, n_blocks=config.n_inc_blocks):
-        # Bottelneck Blocks
-        for _ in range(self.n_inc_blocks):
-            x = self.inception_block(x,[64,48,32,32,48,64],[1,3,5])
-            #x = self.se_block(x)
+        # Inception Blocks
+        for _ in range(n_blocks):
+            x = self.inception_block(x,[64,32,32,16,32,64],[1,3,5])
+            x = self.sub_residual_block(x,ratio=8)
+            x = self.activation(x)
+            x = layers.BatchNormalization()(x)
         return x
-  
-    def inception_block(self,x,filters,kernels):
-        t1 = layers.Conv2D(filters[0],kernels[0])(x)
+    
+    def build_model(self,n_blocks=config.n_inc_blocks):
+        return super().build_model(n_blocks)
+    
+
+
+    def inception_block(self,x,filters,kernels,pad='same'):
+        t1 = layers.Conv2D(filters[0],kernels[0],padding=pad)(x)
         t1 = self.activation(t1)
 
-        t2 = layers.Conv2D(filters[1],kernels[0])(x) 
+        t2 = layers.Conv2D(filters[1],kernels[0],padding=pad)(x) 
         t2 = self.activation(t2)
-        t2 = layers.Conv2D(filters[2],kernels[1],padding='same')(t2)
+        t2 = layers.Conv2D(filters[2],kernels[1],padding=pad)(t2)
         t2 = self.activation(t2)
 
-        t3 = layers.Conv2D(filters[3],kernels[0])(x) 
+        t3 = layers.Conv2D(filters[3],kernels[0],padding=pad)(x) 
         t3 = self.activation(t3)
         t3 = layers.Conv2D(filters[4],kernels[2],padding='same')(t3)
         t3 = self.activation(t3)
         
         t4 = layers.MaxPool2D(kernels[0],padding='same')(x) 
-        t4 = layers.Conv2D(filters[5],kernels[0])(t4)
+        t4 = layers.Conv2D(filters[5],kernels[0],padding=pad)(t4)
         t4 = self.activation(t4)
         
         return layers.Concatenate()([t1,t2,t3,t4])
 
-    def inverted_residual_block(self,x, expand=64, squeeze=16):
-        block = layers.Conv2D(expand, (1,1), activation='relu')(x)
-        block = layers.DepthwiseConv2D((3,3),padding='same',activation='relu')(block)
-        block = layers.Conv2D(squeeze, (1,1), activation='relu')(block)
-        return layers.Add()([block, x])
-
-    def se_block(self,x, filters=192, squeeze_ratio=0.25):
-        x_ = layers.GlobalAveragePooling2D()(x)
-        x_ = layers.Reshape((1,1,filters))(x_)
-        squeezed_filters = max(1, int(filters * squeeze_ratio))
-        x_ = layers.Conv2D(squeezed_filters ,1, activation='relu')(x_)
-        x_ = layers.Conv2D(filters,1, activation='sigmoid')(x_)
-        return layers.Multiply()([x, x_])
-    
-    def mbConv_block(self,input_data, block_arg):
-        kernel_size = block_arg.kernel_size
-        num_repeat  = block_arg.num_repeat
-        input_filters = block_arg.input_filters
-        output_filters = block_arg.output_filters
-        expand_ratio = block_arg.expand_ratio
-        id_skip = block_arg.id_skip
-        strides = block_arg.strides
-        se_ratio = block_arg.se_ratio
-        expanded_filters = input_filters * expand_ratio
-
-        x = layers.Conv2D(expanded_filters, 1, padding='same', use_bias=0)(input_data)
-        x = layers.BatchNormalization()(x)
-        x = self.activation(x)
-
-        x = layers.DepthwiseConv2D(kernel_size, strides, padding='same', use_bias=0)(x)
-        x = layers.BatchNormalization()(x)
-        x = self.activation(x)
-        
-        #se = self.se_block(input_filters,0.25)
-        #x = layers.Multiply([x, se])
-
-
-        x = layers.Conv2D(output_filters, 1, padding='same', use_bias=0)(x)
-        x = layers.BatchNormalization()(x)
-        x = self.activation(x)
-        return x
 
     def output_policy_block(self,x):
         policy_head = layers.Conv2D(1, 1, padding='same', use_bias=False, kernel_regularizer=self.l2_reg)(x)
@@ -118,3 +84,6 @@ class DGMV2(DGM):
         value_head = layers.Dropout(self.dropout)(value_head)
         value_head = layers.Dense(1, activation='sigmoid', name='value', kernel_regularizer=self.l2_reg)(value_head)
         return value_head
+
+    def activation(self,x):
+        return nn.swish(x)
