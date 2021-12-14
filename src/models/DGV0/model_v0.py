@@ -129,7 +129,7 @@ class DGM(object):
     
     def sub_residual_block(self,x1,ratio=4):
         x = layers.Dropout(self.dropout)(x1)
-        x = layers.GlobalMaxPooling2D()(x)
+        x = layers.GlobalAveragePooling2D()(x)
         x = layers.Dense(self.n_filters//ratio, activation='relu')(x)
         x = layers.Dense(self.n_filters, activation='sigmoid')(x)
         return layers.Multiply()([x1, x])
