@@ -85,11 +85,16 @@ class Trainer(object):
             golois.getBatch(input_data, policy, value, end, groups, epoch*self.config.n_samples)
             #with tf.device(self.config.device):
             if self.config.annealing:
-                #lr = cosine_annealing(epoch=epoch,lr_min=self.config.lr_min,
-                #                      lr_max=self.config.lr,n_epochs=self.config.n_epochs,
-	        #                      n_cycles=self.config.n_cycles)
-                lr = K.eval(self.model.optimizer.lr)
-                if   epoch < 100:
+                
+                lr = cosine_annealing(epoch=epoch,lr_min=self.config.lr_min,
+                                      lr_max=self.config.lr,n_epochs=(self.config.end_epoch - self.config.start_epoch + 1),
+	                                 n_cycles=self.config.n_cycles)
+
+
+                #lr = K.eval(self.model.optimizer.lr)
+                
+                '''
+                if  epoch < 100:
                      lr = 0.005
                 elif epoch > 100 and epoch < 150 :
                      lr = 0.00425
@@ -131,28 +136,11 @@ class Trainer(object):
                      lr = 0.000015
                 else:
                      lr = 0.0000125
+               
                 # lr = cosine_annealing(epoch=epoch,lr_min=self.config.lr_min,
                 #                      lr_max=self.config.lr,n_epochs=self.config.n_epochs,
                 #                     n_cycles=self.config.n_cycles)
                 #lr = K.eval(self.model.optimizer.lr) 
-                '''
-		if epoch < 150 : 
-                     lr = 0.005
-                elif epoch >= 150 and epoch < 230  :
-                     lr = 0.001
-                elif epoch >= 230 and epoch < 280 :
-                     lr = 0.0009
-                elif epoch >= 280 and epoch < 320:
-                     lr = 0.00075
-                elif epoch >= 320 and epoch < 370:
-                     lr = 0.0005
-                elif epoch >= 370 and epoch < 420:
-                     lr = 0.00035
-
-                elif epoch >= 420 and epoch < 470:
-                     lr = 0.0002   
-                else :
-                     lr = 0.0000375 
                 '''
                 title = Markdown(f'# [LR-Cosine] Old Learning Rate : `{K.eval(self.model.optimizer.lr):.7f}` ==> New Learning Rate : `{lr:.7f}` ', self.config.info_style)
                 console.print(title)
@@ -175,12 +163,12 @@ class Trainer(object):
                 title = Markdown(f"# Validation : {val}", style=self.config.succes_style)
                 console.print(title)
                 val_hist.append(val)
-                self.model.save(f"12LR_inception_se_160_sw_{self.config.start_epoch}_to_{self.config.end_epoch}_{self.model_path}")       
+                self.model.save(f"cosine_inception_se_192_sw_{self.config.start_epoch}_to_{self.config.end_epoch}_{self.model_path}")       
         title = Markdown(f"## END of Training Saving Last [DGM]...", style=self.config.succes_style)
         console.print(title)
         histories['val_history'] = val_hist
 
-        with open(f"{self.hist_path}_12LR_inception_se_160_sw_{self.config.end_epoch}", 'wb') as f_hist:
+        with open(f"{self.hist_path}_cosine_inception_se_192_sw_{self.config.end_epoch}", 'wb') as f_hist:
             pickle.dump(histories, f_hist)
 
         return histories
