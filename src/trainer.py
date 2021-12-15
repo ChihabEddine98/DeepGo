@@ -87,7 +87,7 @@ class Trainer(object):
             if self.config.annealing:
                 
                 lr = cosine_annealing(epoch=epoch,lr_min=self.config.lr_min,
-                                      lr_max=self.config.lr,n_epochs=(self.config.end_epoch - self.config.start_epoch + 1),
+                                      lr_max=self.config.lr,n_epochs=self.config.n_epochs,
 	                                 n_cycles=self.config.n_cycles)
 
 
