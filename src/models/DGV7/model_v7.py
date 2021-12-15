@@ -10,12 +10,12 @@ from models.DGV0.model_v0 import DGM
 # end imports
 
 
-config = DotDict({  'n_filters'     : 160,
+config = DotDict({  'n_filters'     : 192,
                     'kernel'        : 5,
                     'n_res_blocks'  : 8,
                     'l2_reg'        : 0.0001,
                     'dropout'       : 0.2,
-                    'n_inc_blocks'  : 17,
+                    'n_inc_blocks'  : 14,
                     'squeeze'       : 16,
                 })
 
@@ -36,7 +36,7 @@ class DGMV8(DGM):
     def body_block(self, x, n_blocks=config.n_inc_blocks):
         # Inception Blocks
         for _ in range(n_blocks):
-            x = self.inception_block(x,[64,32,16,32,16,64],[1,3,5])
+            x = self.inception_block(x,[64,32,32,16,32,64],[1,3,5])
             x = self.sub_residual_block(x,ratio=8)
             x = self.activation(x)
             x = layers.BatchNormalization()(x)
@@ -66,10 +66,10 @@ class DGMV8(DGM):
         t4 = self.activation(t4)
         
         return layers.Concatenate()([t1,t2,t3,t4])
-
+    
 
     def output_policy_block(self,x):
-        policy_head = layers.Conv2D(1, 1, padding='same', use_bias=False, kernel_regularizer=self.l2_reg)(x)
+        policy_head = layers.Conv2D(1, 1, padding='same', use_bias=0, kernel_regularizer=self.l2_reg)(x)
         policy_head = self.activation(policy_head)
         policy_head = layers.BatchNormalization()(policy_head)
         policy_head = layers.Flatten()(policy_head)
@@ -78,7 +78,7 @@ class DGMV8(DGM):
 
     def output_value_block(self,x):
         value_head = layers.GlobalAveragePooling2D()(x)
-        value_head = layers.Dense(50, kernel_regularizer=self.l2_reg)(value_head)
+        value_head = layers.Dense(55, kernel_regularizer=self.l2_reg)(value_head)
         value_head = self.activation(value_head)
         value_head = layers.BatchNormalization()(value_head)
         value_head = layers.Dropout(self.dropout)(value_head)
