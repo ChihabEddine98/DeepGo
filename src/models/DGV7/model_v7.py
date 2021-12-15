@@ -10,12 +10,12 @@ from models.DGV0.model_v0 import DGM
 # end imports
 
 
-config = DotDict({  'n_filters'     : 192,
+config = DotDict({  'n_filters'     : 160,
                     'kernel'        : 5,
                     'n_res_blocks'  : 8,
                     'l2_reg'        : 0.0001,
                     'dropout'       : 0.2,
-                    'n_inc_blocks'  : 10,
+                    'n_inc_blocks'  : 17,
                     'squeeze'       : 16,
                 })
 
@@ -36,8 +36,8 @@ class DGMV8(DGM):
     def body_block(self, x, n_blocks=config.n_inc_blocks):
         # Inception Blocks
         for _ in range(n_blocks):
-            x = self.inception_block(x,[64,32,32,48,32,64],[1,3,5])
-            x = self.sub_residual_block(x,ratio=16)
+            x = self.inception_block(x,[64,32,16,32,16,64],[1,3,5])
+            x = self.sub_residual_block(x,ratio=8)
             x = self.activation(x)
             x = layers.BatchNormalization()(x)
         return x
@@ -86,4 +86,4 @@ class DGMV8(DGM):
         return value_head
 
     def activation(self,x):
-        return x*nn.relu6(x+3)*0.1666666667
+        return nn.swish(x)
