@@ -1,5 +1,6 @@
 import pickle
 import gc
+from tensorflow import set_random_seed
 
 from math import cos,floor,pi
 
@@ -14,7 +15,7 @@ import golois
 from utils import configs
 from dataloader import DataHandler
 
-
+set_random_seed(42)
 
 # calculate learning rate for an epoch
 '''

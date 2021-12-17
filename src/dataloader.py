@@ -5,6 +5,8 @@ from tensorflow.keras.utils import to_categorical
 from utils import configs
 # end imports
 
+numpy.random.seed(42)
+
 '''
     -------------------------------------------------------------------------------------------     
         DataHandler : in this class we handle all stuff related to data shaping and/or
