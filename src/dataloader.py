@@ -1,11 +1,11 @@
 # imports
 from numpy import zeros
-from numpy.random import randint
+from numpy.random import randint,seed
 from tensorflow.keras.utils import to_categorical
 from utils import configs
 # end imports
 
-numpy.random.seed(42)
+seed(42)
 
 '''
     -------------------------------------------------------------------------------------------     
