@@ -9,7 +9,7 @@ from utils import DotDict,configs
 from models.DGV0.model_v0 import DGM
 # end imports
 
-
+# Train : python train.py -gpu 2 -s 1 -e 1200 -b 1024
 config = DotDict({  'n_filters'     : 192,
                     'kernel'        : 5,
                     'n_res_blocks'  : 8,
