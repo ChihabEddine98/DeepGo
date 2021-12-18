@@ -23,12 +23,16 @@ def cosine_annealing(epoch, n_epochs,n_steps, n_cycles, lr_max):
     epochs_per_cycle = floor(n_epochs/n_cycles)
     cos_inner = (pi * (epoch % epochs_per_cycle)) / (n_steps* epochs_per_cycle)
     return lr_max / 2 * (cos(cos_inner) + 1)
-'''
+
 def cosine_annealing(epoch,lr_min,lr_max,n_epochs, n_cycles):
     epochs_per_cycle = floor(n_epochs/n_cycles)
     cos_inner = (pi * (epoch % epochs_per_cycle)) / (epochs_per_cycle)
     lr = lr_min + 0.5 * (lr_max - lr_min) * (1 + cos(cos_inner))
     return lr
+'''
+
+def cosine_annealing(epoch,lr_min=configs.lr_min,lr_max=configs.lr,n_epochs=configs.n_epochs):
+    return lr_min + 0.5 * (lr_max - lr_min) * (1 + cos(pi*(epoch/n_epochs)))
 
 class Scheduler(Callback):
 	# constructor
@@ -87,9 +91,7 @@ class Trainer(object):
             #with tf.device(self.config.device):
             if self.config.annealing:
                 
-                lr = cosine_annealing(epoch=epoch,lr_min=self.config.lr_min,
-                                      lr_max=self.config.lr,n_epochs=self.config.n_epochs,
-	                                 n_cycles=self.config.n_cycles)
+                lr = cosine_annealing(epoch=epoch)
 
 
                 #lr = K.eval(self.model.optimizer.lr)
@@ -164,12 +166,12 @@ class Trainer(object):
                 title = Markdown(f"# Validation : {val}", style=self.config.succes_style)
                 console.print(title)
                 val_hist.append(val)
-                self.model.save(f"cosine_inception_se_192_sw_1000_{self.config.start_epoch}_to_{self.config.end_epoch}_{self.model_path}")       
+                self.model.save(f"cosine_inception_se_192_sw_{self.config.start_epoch}_to_{self.config.end_epoch}_{self.model_path}")       
         title = Markdown(f"## END of Training Saving Last [DGM]...", style=self.config.succes_style)
         console.print(title)
         histories['val_history'] = val_hist
 
-        with open(f"{self.hist_path}_cosine_inception_se_192_sw_1000_{self.config.end_epoch}", 'wb') as f_hist:
+        with open(f"{self.hist_path}_cosine_inception_se_192_sw_{self.config.end_epoch}", 'wb') as f_hist:
             pickle.dump(histories, f_hist)
 
         return histories
