@@ -14,7 +14,7 @@ from models.DGV5.model_v5 import DGMV2
 from models.DGV6.model_v6 import DGMV6
 from models.DGV7.model_v7 import DGMV8
 from models.DGV8.model_v8 import DGMV9
-
+from models.DGV8.model_v8_2 import DGMV9_2
 
 from trainer import Trainer
 from utils import configs
@@ -76,7 +76,7 @@ if __name__ == '__main__':
 
     # Build the model 
     with strategy.scope():
-        dgm = DGMV9() 
+        dgm = DGMV9_2() 
         # Check if we wanna load an existing model and continue train
         if args.load != '':
             model = keras.models.load_model(args.load)
