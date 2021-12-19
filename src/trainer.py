@@ -92,59 +92,6 @@ class Trainer(object):
             if self.config.annealing:
                 
                 lr = cosine_annealing(epoch=epoch)
-
-
-                #lr = K.eval(self.model.optimizer.lr)
-                
-                '''
-                if  epoch < 100:
-                     lr = 0.005
-                elif epoch > 100 and epoch < 150 :
-                     lr = 0.00425
-                elif epoch >= 150 and epoch < 200 :
-                     lr = 0.00375
-                elif epoch >= 200 and epoch < 250  :
-                     lr = 0.002
-                elif epoch >= 250 and epoch < 320 :
-                     lr = 0.00125
-                elif epoch >= 320 and epoch < 370:
-                     lr = 0.000725
-                elif epoch >= 370 and epoch < 400:
-                     lr = 0.000525
-                elif epoch >= 400 and epoch < 440:
-                     lr = 0.000375
-                elif epoch >= 440 and epoch < 470:
-                     lr = 0.00025
-                elif epoch >= 470 and epoch < 520:
-                     lr = 0.000125
-                elif epoch >= 520 and epoch < 560:
-                     lr = 0.0000975
-                elif epoch >= 560 and epoch < 590:
-                     lr = 0.0000875
-                elif epoch >= 590 and epoch < 630:
-                     lr = 0.00008
-                elif epoch >= 630 and epoch < 670:
-                     lr = 0.000075
-                elif epoch >= 670 and epoch < 700:
-                     lr = 0.0000625
-                elif epoch >= 700 and epoch < 730:
-                     lr = 0.0000525
-                elif epoch >= 730 and epoch < 770:
-                     lr = 0.0000425
-                elif epoch >= 770 and epoch < 800:
-                     lr = 0.0000325
-                elif epoch >= 800 and epoch < 830:
-                     lr = 0.0000225
-                elif epoch >= 830 and epoch < 865:
-                     lr = 0.000015
-                else:
-                     lr = 0.0000125
-               
-                # lr = cosine_annealing(epoch=epoch,lr_min=self.config.lr_min,
-                #                      lr_max=self.config.lr,n_epochs=self.config.n_epochs,
-                #                     n_cycles=self.config.n_cycles)
-                #lr = K.eval(self.model.optimizer.lr) 
-                '''
                 title = Markdown(f'# [LR-Cosine] Old Learning Rate : `{K.eval(self.model.optimizer.lr):.7f}` ==> New Learning Rate : `{lr:.7f}` ', self.config.info_style)
                 console.print(title)
                 K.set_value(self.model.optimizer.lr, lr)
@@ -166,12 +113,12 @@ class Trainer(object):
                 title = Markdown(f"# Validation : {val}", style=self.config.succes_style)
                 console.print(title)
                 val_hist.append(val)
-                self.model.save(f"mnet_se_256_sw_{self.config.start_epoch}_to_{self.config.end_epoch}_{self.model_path}")       
+                self.model.save(f"mnas_165_sw_{self.config.start_epoch}_to_{self.config.end_epoch}_{self.model_path}")       
         title = Markdown(f"## END of Training Saving Last [DGM]...", style=self.config.succes_style)
         console.print(title)
         histories['val_history'] = val_hist
 
-        with open(f"{self.hist_path}_mnet_se_256_sw_{self.config.end_epoch}", 'wb') as f_hist:
+        with open(f"{self.hist_path}_mnas_165_sw_{self.config.end_epoch}", 'wb') as f_hist:
             pickle.dump(histories, f_hist)
 
         return histories
