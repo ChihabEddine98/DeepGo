@@ -12,10 +12,10 @@ from models.DGV0.model_v0 import DGM
 
 
 
-config = DotDict({  'n_filters'     : 60,
+config = DotDict({  'n_filters'     : 57,
                     'kernel'        : 5,
                     'n_res_blocks'  : 6,
-                    'n_cbam_blocks' : 8,
+                    'n_cbam_blocks' : 9,
                     'l2_reg'        : 0.0001,
                     'dropout'       : 0.2,
                 })
@@ -77,7 +77,7 @@ class DGMV4(DGM):
         x1 = layers.Conv2D(self.n_filters, 5, padding='same')(x1)
         x1 = layers.BatchNormalization()(x1)
 
-        x1 = self.channel_attention_module(x1, self.n_filters, ratio=16)
+        x1 = self.channel_attention_module(x1, self.n_filters, ratio=4)
         x1 = self.spatial_attention_module(x1)
 
 
@@ -117,4 +117,4 @@ class DGMV4(DGM):
     
     
     def activation(self, x):
-        return x*nn.relu6(x+3)*0.1666666666667
+        return nn.swish(x)
