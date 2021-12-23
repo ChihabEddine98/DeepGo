@@ -27,7 +27,7 @@ config = DotDict({  'n_filters'     : 165,
 '''
 class DGMV9(DGM):
     
-    def __init__(self,version=8,n_filters=config.n_filters,kernel_size=config.kernel,l2_reg=config.l2_reg
+    def __init__(self,version=9,n_filters=config.n_filters,kernel_size=config.kernel,l2_reg=config.l2_reg
                 ,dropout=config.dropout,n_inc_blocks=config.n_inc_blocks,squeeze=config.squeeze,arch = config.arch) -> None:
         super().__init__(version=version,n_filters=n_filters,kernel_size=kernel_size,l2_reg=l2_reg,dropout=dropout)
 
