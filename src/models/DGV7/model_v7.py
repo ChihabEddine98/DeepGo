@@ -11,12 +11,12 @@ from models.DGV0.model_v0 import DGM
 
 # continue from 450 epochs to 2500
 # Train : python train.py -gpu 2 -s 1 -e 1200 -b 1024
-config = DotDict({  'n_filters'     : 192,
+config = DotDict({  'n_filters'     : 176,
                     'kernel'        : 5,
                     'n_res_blocks'  : 8,
                     'l2_reg'        : 0.0001,
                     'dropout'       : 0.2,
-                    'n_inc_blocks'  : 14,
+                    'n_inc_blocks'  : 16,
                     'squeeze'       : 16,
                 })
 
@@ -37,7 +37,7 @@ class DGMV8(DGM):
     def body_block(self, x, n_blocks=config.n_inc_blocks):
         # Inception Blocks
         for _ in range(n_blocks):
-            x = self.inception_block(x,[64,32,32,16,32,64],[1,3,5])
+            x = self.inception_block(x,[64,32,32,16,32,48],[1,3,5])
             x = self.sub_residual_block(x,ratio=8)
             x = self.activation(x)
             x = layers.BatchNormalization()(x)
@@ -49,21 +49,21 @@ class DGMV8(DGM):
 
 
     def inception_block(self,x,filters,kernels,pad='same'):
-        t1 = layers.Conv2D(filters[0],kernels[0],padding=pad)(x)
+        t1 = layers.Conv2D(filters[0],kernels[0],use_bias=0, kernel_regularizer=self.l2_reg)(x)
         t1 = self.activation(t1)
 
-        t2 = layers.Conv2D(filters[1],kernels[0],padding=pad)(x) 
+        t2 = layers.Conv2D(filters[1],kernels[0],use_bias=0, kernel_regularizer=self.l2_reg)(x) 
         t2 = self.activation(t2)
-        t2 = layers.Conv2D(filters[2],kernels[1],padding=pad)(t2)
+        t2 = layers.Conv2D(filters[2],kernels[1],padding=pad,use_bias=0, kernel_regularizer=self.l2_reg)(t2)
         t2 = self.activation(t2)
 
-        t3 = layers.Conv2D(filters[3],kernels[0],padding=pad)(x) 
+        t3 = layers.Conv2D(filters[3],kernels[0],use_bias=0, kernel_regularizer=self.l2_reg)(x) 
         t3 = self.activation(t3)
-        t3 = layers.Conv2D(filters[4],kernels[2],padding='same')(t3)
+        t3 = layers.Conv2D(filters[4],kernels[2],padding=pad,use_bias=0, kernel_regularizer=self.l2_reg)(t3)
         t3 = self.activation(t3)
         
-        t4 = layers.MaxPool2D(kernels[0],padding='same')(x) 
-        t4 = layers.Conv2D(filters[5],kernels[0],padding=pad)(t4)
+        t4 = layers.MaxPool2D(kernels[0])(x) 
+        t4 = layers.Conv2D(filters[5],kernels[0],use_bias=0, kernel_regularizer=self.l2_reg)(t4)
         t4 = self.activation(t4)
         
         return layers.Concatenate()([t1,t2,t3,t4])

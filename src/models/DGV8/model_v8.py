@@ -10,14 +10,14 @@ from models.DGV0.model_v0 import DGM
 # end imports
 
 # Train : python train.py -gpu 2 -s 1 -e 1200 -b 1024
-config = DotDict({  'n_filters'     : 165,
+config = DotDict({  'n_filters'     : 150,
                     'kernel'        : 5,
                     'n_res_blocks'  : 8,
                     'l2_reg'        : 0.0001,
                     'dropout'       : 0.2,
                     'n_inc_blocks'  : 14,
-                    'squeeze'       : 16,
-                    'arch': [2,3,4,2,3,1]
+                    'squeeze'       : 64,
+                    'arch': [1,4,2,3,4,1]
                 })
 
 '''
@@ -109,6 +109,18 @@ class DGMV9(DGM):
     def bn_activation(self,x):
         return self.activation(layers.BatchNormalization()(x))
 
+    def input_block(self,inp,kernel_resize=5,pad='same'):
+        # CONV2D + BN + activation 
+        x = layers.Conv2D(self.n_filters, 3, padding=pad)(inp)
+        x = self.bn_activation(x)
+        
+        # CONV2D (resize) + BN + activation
+        x1 = layers.Conv2D(self.n_filters,kernel_resize, padding=pad)(inp)
+        x1 = self.bn_activation(x1)
+
+        x = layers.add([x, x1])
+        return x
+
     def output_policy_block(self,x):
         policy_head = layers.Conv2D(1, 1, padding='same', use_bias=0, kernel_regularizer=self.l2_reg)(x)
         policy_head = self.activation(policy_head)
@@ -119,7 +131,7 @@ class DGMV9(DGM):
 
     def output_value_block(self,x):
         value_head = layers.GlobalAveragePooling2D()(x)
-        value_head = layers.Dense(50, kernel_regularizer=self.l2_reg)(value_head)
+        value_head = layers.Dense(271, kernel_regularizer=self.l2_reg)(value_head)
         value_head = self.activation(value_head)
         value_head = layers.BatchNormalization()(value_head)
         value_head = layers.Dropout(self.dropout)(value_head)
