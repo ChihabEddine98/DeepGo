@@ -76,7 +76,7 @@ if __name__ == '__main__':
 
     # Build the model 
     with strategy.scope():
-        dgm = DGMV5() 
+        dgm = DGMV9() 
         # Check if we wanna load an existing model and continue train
         if args.load != '':
             model = keras.models.load_model(args.load)
