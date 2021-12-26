@@ -114,8 +114,8 @@ class Trainer(object):
                 console.print(title)
                 val_hist.append(val)
                 histories['val_history'] = val_hist
-                self.model.save(f"mnet_256_16_625_sw_{self.config.start_epoch}_to_{self.config.end_epoch}_{self.model_path}")                  
-                with open(f"{self.hist_path}_mnet_256_16_625_sw_{self.config.start_epoch}_to_{self.config.end_epoch}",'wb') as f_hist:
+                self.model.save(f"mnet_256_16_1.6_0005_sw_{self.config.start_epoch}_to_{self.config.end_epoch}_{self.model_path}")                  
+                with open(f"{self.hist_path}_mnet_256_16_1.6_0005_sw_{self.config.start_epoch}_to_{self.config.end_epoch}",'wb') as f_hist:
                      pickle.dump(histories,f_hist)
                     
         title = Markdown(f"## END of Training Saving Last [DGM]...", style=self.config.succes_style)
@@ -123,7 +123,7 @@ class Trainer(object):
         '''
         histories['val_history'] = val_hist
 
-        with open(f"{self.hist_path}_mnas_256_1.0.0005_sw_{self.config.end_epoch}", 'wb') as f_hist:
+        with open(f"{self.hist_path}_mnas_256_1.6.0005_sw_{self.config.end_epoch}", 'wb') as f_hist:
             pickle.dump(histories, f_hist)
         '''
         return histories
