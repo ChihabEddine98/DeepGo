@@ -18,19 +18,6 @@ from dataloader import DataHandler
 set_seed(42)
 
 # calculate learning rate for an epoch
-'''
-def cosine_annealing(epoch, n_epochs,n_steps, n_cycles, lr_max):
-    epochs_per_cycle = floor(n_epochs/n_cycles)
-    cos_inner = (pi * (epoch % epochs_per_cycle)) / (n_steps* epochs_per_cycle)
-    return lr_max / 2 * (cos(cos_inner) + 1)
-
-def cosine_annealing(epoch,lr_min,lr_max,n_epochs, n_cycles):
-    epochs_per_cycle = floor(n_epochs/n_cycles)
-    cos_inner = (pi * (epoch % epochs_per_cycle)) / (epochs_per_cycle)
-    lr = lr_min + 0.5 * (lr_max - lr_min) * (1 + cos(cos_inner))
-    return lr
-'''
-
 def cosine_annealing(epoch,lr_min=configs.lr_min,lr_max=configs.lr,n_epochs=configs.n_epochs):
     return lr_min + 0.5 * (lr_max - lr_min) * (1 + cos(pi*(epoch/n_epochs)))
 
@@ -115,20 +102,14 @@ class Trainer(object):
                 val_hist.append(val)
                 histories['val_history'] = val_hist
 
-                self.model.save(f"incp_192_14_0.01_sw_{self.config.start_epoch}_to_{self.config.end_epoch}_{self.model_path}")                  
-                with open(f"{self.hist_path}_incp_192_14_0.01_sw_{self.config.start_epoch}_to_{self.config.end_epoch}",'wb') as f_hist:
+                self.model.save(f"mnet_302_17_0.005_sw_{self.config.start_epoch}_to_{self.config.end_epoch}_{self.model_path}")                  
+                with open(f"{self.hist_path}_mnet_302_17_0.005_sw_{self.config.start_epoch}_to_{self.config.end_epoch}",'wb') as f_hist:
                     pickle.dump(histories, f_hist)
-                
-                self.model.save(f"incp_192_14_0.01_sw_{self.config.start_epoch}_to_{self.config.end_epoch}_{self.model_path}")                  
-                    
+            
         title = Markdown(f"## END of Training Saving Last [DGM]...", style=self.config.succes_style)
         console.print(title)
-        '''
-        histories['val_history'] = val_hist
 
-        with open(f"{self.hist_path}_mnas_256_1.6.0005_sw_{self.config.end_epoch}", 'wb') as f_hist:
-            pickle.dump(histories, f_hist)
-        '''
+
         return histories
 
 
