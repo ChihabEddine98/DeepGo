@@ -79,7 +79,7 @@ class Trainer(object):
             if self.config.annealing:
                 
                 lr = cosine_annealing(epoch=epoch)
-                title = Markdown(f'# [LR-Cosine] Old Learning Rate : `{K.eval(self.model.optimizer.lr):.7f}` ==> New Learning Rate : `{lr:.7f}` ', self.config.info_style)
+                title = Markdown(f'# [LR-Cosine] Old LR : `{K.eval(self.model.optimizer.lr):.10f}` ==> New LR : `{lr:.10f}` ', self.config.info_style)
                 console.print(title)
                 K.set_value(self.model.optimizer.lr, lr)
                 
