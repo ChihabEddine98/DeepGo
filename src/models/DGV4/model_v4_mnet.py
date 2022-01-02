@@ -105,7 +105,7 @@ class DGMV5(DGM):
         
     def output_value_block(self,x):
         value_head = layers.GlobalAveragePooling2D()(x)
-        value_head = layers.Dense(350, kernel_regularizer=self.l2_reg)(value_head)
+        value_head = layers.Dense(360, kernel_regularizer=self.l2_reg)(value_head)
         value_head = layers.BatchNormalization()(value_head)
         value_head = self.activation(value_head)
         value_head = layers.Dropout(self.dropout)(value_head)
