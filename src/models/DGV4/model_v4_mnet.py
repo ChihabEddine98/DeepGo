@@ -15,7 +15,7 @@ config = DotDict({  'n_filters'     : 302,
                     'squeeze'       : 64,
                     'kernel'        : 5,
                     'n_res_blocks'  : 6,
-                    'n_btk_blocks'  : 16,
+                    'n_btk_blocks'  : 21,
                     'l2_reg'        : 0.0001,
                     'dropout'       : 0.2,
                     'repetitions'   : (3,7,3),
@@ -82,7 +82,7 @@ class DGMV5(DGM):
         m = self.activation(m)
 
         #m = layers.Dropout(self.dropout)(m)
-        m = self.sub_residual_block(m,ratio=16)
+        m = self.sub_residual_block(m,ratio=64)
         #m = self.channel_attention_module(m, self.n_filters, ratio=16)
 
         m = layers.Conv2D(self.squeeze, 1,kernel_regularizer=self.l2_reg,use_bias=0)(m)
@@ -105,7 +105,7 @@ class DGMV5(DGM):
         
     def output_value_block(self,x):
         value_head = layers.GlobalAveragePooling2D()(x)
-        value_head = layers.Dense(384, kernel_regularizer=self.l2_reg)(value_head)
+        value_head = layers.Dense(310, kernel_regularizer=self.l2_reg)(value_head)
         value_head = layers.BatchNormalization()(value_head)
         value_head = self.activation(value_head)
         value_head = layers.Dropout(self.dropout)(value_head)
