@@ -10,7 +10,7 @@ from models.DGV0.model_v0 import DGM
 # end imports
 
 # Train : python train.py -gpu 2 -s 1 -e 1200 -b 1024
-config = DotDict({  'n_filters'     : 256,
+config = DotDict({  'n_filters'     : 384,
                     'kernel'        : 5,
                     'n_res_blocks'  : 8,
                     'l2_reg'        : 0.0001,
@@ -19,11 +19,11 @@ config = DotDict({  'n_filters'     : 256,
                     'squeeze'       : 64,
                     'arch': [
                                [2,3,0],
-                               [4,5,1],
+                               [3,5,1],
                                [2,3,0],
                                [2,3,1],
-                               [5,5,1],
-                               [1,3,1]
+                               [2,5,1],
+                               [1,3,0]
                             ]
                 })
 
@@ -70,7 +70,7 @@ class DGMV9_2(DGM):
         return x
     
         
-    def sep_conv(self,x,k=5,pad='same'):
+    def sep_conv(self,x,k=3,pad='same'):
         x = layers.DepthwiseConv2D(k,padding=pad,kernel_regularizer=self.l2_reg,use_bias=0)(x)
         x = self.bn_activation(x)
         x = layers.Conv2D(self.squeeze, 1,kernel_regularizer=self.l2_reg,use_bias=0)(x)
@@ -111,7 +111,7 @@ class DGMV9_2(DGM):
 
     def output_value_block(self,x):
         value_head = layers.GlobalAveragePooling2D()(x)
-        value_head = layers.Dense(512, kernel_regularizer=self.l2_reg)(value_head)
+        value_head = layers.Dense(50, kernel_regularizer=self.l2_reg)(value_head)
         #value_head = self.bn_activation(value_head)
         value_head = self.activation(value_head)
         value_head = layers.BatchNormalization()(value_head)
