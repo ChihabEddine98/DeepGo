@@ -17,7 +17,14 @@ config = DotDict({  'n_filters'     : 256,
                     'dropout'       : 0.2,
                     'n_inc_blocks'  : 14,
                     'squeeze'       : 64,
-                    'arch': [3,3,4,4,2,1]
+                    'arch': [
+                               [2,3,0],
+                               [4,5,1],
+                               [2,3,0],
+                               [2,3,1],
+                               [5,5,1],
+                               [1,3,1]
+                            ]
                 })
 
 '''
@@ -36,71 +43,17 @@ class DGMV9_2(DGM):
         self.arch = arch
 
 
-    def body_block_(self, x,n_blocks=config.n_inc_blocks):
-        # Mixed kernels Blocks
-        x = self.sep_conv(x)
-        
-        # MBConv6 3x3
-        for _ in range(self.arch[0]):
-            x = self.mb_conv6(x,k=3)
-        
-        # MBConv3 5x5 (With SE)
-        for _ in range(self.arch[1]):
-            x = self.mb_conv3(x,k=5)
-            x = self.sub_residual_block(x)
-
-        # MBConv6 3x3 (No SE)
-        for _ in range(self.arch[2]):
-            x = self.mb_conv6(x,k=3)
-            
-        # MBConv6 3x3 (SE)
-        for _ in range(self.arch[3]):
-            x = self.mb_conv6(x,k=3)
-            x = self.sub_residual_block(x)
-            
-        # MBConv6 5x5 (With SE)
-        for _ in range(self.arch[4]):
-            x = self.mb_conv6(x,k=5)
-            x = self.sub_residual_block(x)
-            
-        # MBConv 3x3 (No SE)
-        for _ in range(self.arch[5]):
-            x = self.mb_conv6(x,k=3)
-        
-        return x
-        
     def body_block(self, x,n_blocks=config.n_inc_blocks):
         # Mixed kernels Blocks
         x = self.sep_conv(x)
         
-        # MBConv 3x3
-        for _ in range(self.arch[0]):
-            x = self.mb_conv(x,k=3,se=0)
-        
-        # MBConv 5x5 (With SE)
-        for _ in range(self.arch[1]):
-            x = self.mb_conv(x,k=5,se=1)
-
-        # MBConv 3x3 (No SE)
-        for _ in range(self.arch[2]):
-            x = self.mb_conv(x,k=3,se=0)
-            
-        # MBConv 3x3 (SE)
-        for _ in range(self.arch[3]):
-            x = self.mb_conv(x,k=3,se=1)
-            
-        # MBConv 5x5 (With SE)
-        for _ in range(self.arch[4]):
-            x = self.mb_conv(x,k=5,se=1)
-            
-        # MBConv 3x3 (No SE)
-        for _ in range(self.arch[5]):
-            x = self.mb_conv(x,k=3,se=0)
-        
+        for nb,kernel,se in self.arch :
+            for _ in range(nb):
+                x = self.mb_conv(x,k=kernel,se=se) 
         return x
         
-    # MBConv(kernel : 5x5)
-    def mb_conv(self,x,se=1,k=3,r=4,pad='same'):
+    # MBConv(kernel : kxk)
+    def mb_conv(self,x,se=1,k=3,r=6,pad='same'):
         x_ = layers.Conv2D(self.n_filters,1,padding=pad,kernel_regularizer=self.l2_reg,use_bias=0)(x)
         x_ = self.bn_activation(x_)
         
@@ -116,38 +69,8 @@ class DGMV9_2(DGM):
         x = layers.add([x_, x])
         return x
     
-    # MBConv6(kernel : 5x5)
-    def mb_conv3(self,x,se=1,k=5,r=6,pad='same'):
-        x_ = layers.Conv2D(self.n_filters,1,padding=pad,kernel_regularizer=self.l2_reg,use_bias=0)(x)
-        x_ = self.bn_activation(x_)
         
-        x_ = layers.DepthwiseConv2D(k,padding=pad,kernel_regularizer=self.l2_reg,use_bias=0)(x_)
-        x_ = self.bn_activation(x_)
-        
-
-        x_ = self.sub_residual_block(x_,ratio=r)
-        
-        x_ = layers.Conv2D(self.n_filters, 1,kernel_regularizer=self.l2_reg,use_bias=0)(x_)
-        x_ = layers.BatchNormalization()(x_)
-        
-        x = layers.add([x_, x])
-        return x
-    
-    # MBConv(kernel : 3x3)
-    def mb_conv6(self,x,k=3,pad='same'):
-        x_ = layers.Conv2D(self.n_filters,1,padding=pad,kernel_regularizer=self.l2_reg,use_bias=0)(x)
-        x_ = self.bn_activation(x_)
-        
-        x_ = layers.DepthwiseConv2D(k,padding=pad,kernel_regularizer=self.l2_reg,use_bias=0)(x_)
-        x_ = self.bn_activation(x_)
-        
-        x_ = layers.Conv2D(self.n_filters, 1,kernel_regularizer=self.l2_reg,use_bias=0)(x_)
-        x_ = layers.BatchNormalization()(x_)
-        
-        x = layers.add([x_, x])
-        return x
-        
-    def sep_conv(self,x,k=3,pad='same'):
+    def sep_conv(self,x,k=5,pad='same'):
         x = layers.DepthwiseConv2D(k,padding=pad,kernel_regularizer=self.l2_reg,use_bias=0)(x)
         x = self.bn_activation(x)
         x = layers.Conv2D(self.squeeze, 1,kernel_regularizer=self.l2_reg,use_bias=0)(x)
@@ -155,7 +78,7 @@ class DGMV9_2(DGM):
         
         return x
     
-    def se_block(self,x,ratio=4):
+    def se_block(self,x,ratio=6):
         x_ = layers.Dropout(self.dropout)(x)
         x_ = layers.GlobalAveragePooling2D()(x_)
         x_ = layers.Dense(self.n_filters//ratio,kernel_regularizer=self.l2_reg,use_bias=1,activation='relu')(x_)
@@ -165,9 +88,18 @@ class DGMV9_2(DGM):
     def bn_activation(self,x):
         return self.activation(layers.BatchNormalization()(x))
 
-    def input_block(self,inp,kernel_resize=0,pad='same'):
-        x = layers.Conv2D(self.squeeze, 3, padding=pad)(inp)  
-        return self.bn_activation(x)
+    def input_block(self,inp,kernel_resize=5,pad='same'):
+        # CONV2D + BN + activation 
+        x = layers.Conv2D(self.squeeze, 3, padding=pad)(inp)
+        x = self.bn_activation(x)
+        
+        # CONV2D (resize) + BN + activation
+        x_ = layers.Conv2D(self.squeeze,kernel_resize, padding=pad)(inp)
+        x_ = self.bn_activation(x_)
+
+        x = layers.add([x, x_])
+        
+        return x
     
     def output_policy_block(self,x):
         policy_head = layers.Conv2D(1, 1, padding='same', use_bias=0, kernel_regularizer=self.l2_reg)(x)
@@ -179,10 +111,10 @@ class DGMV9_2(DGM):
 
     def output_value_block(self,x):
         value_head = layers.GlobalAveragePooling2D()(x)
-        value_head = layers.Dense(384, kernel_regularizer=self.l2_reg)(value_head)
-        value_head = self.bn_activation(value_head)
-        #value_head = self.activation(value_head)
-        #value_head = layers.BatchNormalization()(value_head)
+        value_head = layers.Dense(512, kernel_regularizer=self.l2_reg)(value_head)
+        #value_head = self.bn_activation(value_head)
+        value_head = self.activation(value_head)
+        value_head = layers.BatchNormalization()(value_head)
         value_head = layers.Dropout(self.dropout)(value_head)
         value_head = layers.Dense(1, activation='sigmoid', name='value', kernel_regularizer=self.l2_reg)(value_head)
         return value_head

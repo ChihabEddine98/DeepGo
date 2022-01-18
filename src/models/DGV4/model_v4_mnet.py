@@ -11,11 +11,11 @@ from models.DGV0.model_v0 import DGM
 
 
 
-config = DotDict({  'n_filters'     : 302,
+config = DotDict({  'n_filters'     : 235,
                     'squeeze'       : 64,
                     'kernel'        : 5,
                     'n_res_blocks'  : 6,
-                    'n_btk_blocks'  : 21,
+                    'n_btk_blocks'  : 23,
                     'l2_reg'        : 0.0001,
                     'dropout'       : 0.2,
                     'repetitions'   : (3,7,3),
@@ -105,7 +105,7 @@ class DGMV5(DGM):
         
     def output_value_block(self,x):
         value_head = layers.GlobalAveragePooling2D()(x)
-        value_head = layers.Dense(310, kernel_regularizer=self.l2_reg)(value_head)
+        value_head = layers.Dense(384, kernel_regularizer=self.l2_reg)(value_head)
         value_head = layers.BatchNormalization()(value_head)
         value_head = self.activation(value_head)
         value_head = layers.Dropout(self.dropout)(value_head)
@@ -130,4 +130,4 @@ class DGMV5(DGM):
         return layers.multiply([in_block, activ_x])
 
     def activation(self, x):
-        return nn.swish(x) 
+        return x*nn.relu6(x+3)/6 
