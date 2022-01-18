@@ -11,11 +11,11 @@ from models.DGV0.model_v0 import DGM
 
 
 
-config = DotDict({  'n_filters'     : 235,
-                    'squeeze'       : 64,
+config = DotDict({  'n_filters'     : 256,
+                    'squeeze'       : 43,
                     'kernel'        : 5,
                     'n_res_blocks'  : 6,
-                    'n_btk_blocks'  : 23,
+                    'n_btk_blocks'  : 17,
                     'l2_reg'        : 0.0001,
                     'dropout'       : 0.2,
                     'repetitions'   : (3,7,3),
@@ -49,9 +49,9 @@ class DGMV5(DGM):
     def build_model(self,n_blocks=config.n_btk_blocks):
         return super().build_model(n_blocks)
     
-    def input_block(self,inp,kernel_resize=5,pad='same'):
+    def input_block(self,inp,kernel_resize=7,pad='same'):
         # CONV2D + BN + activation 
-        x = layers.Conv2D(self.squeeze, 3, padding=pad)(inp)
+        x = layers.Conv2D(self.squeeze, 5, padding=pad)(inp)
         x = layers.BatchNormalization()(x)
         x = self.activation(x)
         
@@ -82,7 +82,7 @@ class DGMV5(DGM):
         m = self.activation(m)
 
         #m = layers.Dropout(self.dropout)(m)
-        m = self.sub_residual_block(m,ratio=64)
+        m = self.sub_residual_block(m,ratio=6)
         #m = self.channel_attention_module(m, self.n_filters, ratio=16)
 
         m = layers.Conv2D(self.squeeze, 1,kernel_regularizer=self.l2_reg,use_bias=0)(m)
@@ -105,7 +105,7 @@ class DGMV5(DGM):
         
     def output_value_block(self,x):
         value_head = layers.GlobalAveragePooling2D()(x)
-        value_head = layers.Dense(384, kernel_regularizer=self.l2_reg)(value_head)
+        value_head = layers.Dense(400, kernel_regularizer=self.l2_reg)(value_head)
         value_head = layers.BatchNormalization()(value_head)
         value_head = self.activation(value_head)
         value_head = layers.Dropout(self.dropout)(value_head)
@@ -130,4 +130,4 @@ class DGMV5(DGM):
         return layers.multiply([in_block, activ_x])
 
     def activation(self, x):
-        return x*nn.relu6(x+3)/6 
+        return nn.swish(x)
