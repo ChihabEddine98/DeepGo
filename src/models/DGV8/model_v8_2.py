@@ -53,7 +53,7 @@ class DGMV9_2(DGM):
         return x
         
     # MBConv(kernel : kxk)
-    def mb_conv(self,x,se=1,k=3,r=6,pad='same'):
+    def mb_conv(self,x,se=1,k=3,r=8,pad='same'):
         x_ = layers.Conv2D(self.n_filters,1,padding=pad,kernel_regularizer=self.l2_reg,use_bias=0)(x)
         x_ = self.bn_activation(x_)
         
@@ -70,7 +70,7 @@ class DGMV9_2(DGM):
         return x
     
         
-    def sep_conv(self,x,k=3,pad='same'):
+    def sep_conv(self,x,k=5,pad='same'):
         x = layers.DepthwiseConv2D(k,padding=pad,kernel_regularizer=self.l2_reg,use_bias=0)(x)
         x = self.bn_activation(x)
         x = layers.Conv2D(self.squeeze, 1,kernel_regularizer=self.l2_reg,use_bias=0)(x)
@@ -88,9 +88,9 @@ class DGMV9_2(DGM):
     def bn_activation(self,x):
         return self.activation(layers.BatchNormalization()(x))
 
-    def input_block(self,inp,kernel_resize=5,pad='same'):
+    def input_block(self,inp,kernel_resize=3,pad='same'):
         # CONV2D + BN + activation 
-        x = layers.Conv2D(self.squeeze, 3, padding=pad)(inp)
+        x = layers.Conv2D(self.squeeze, 1, padding=pad)(inp)
         x = self.bn_activation(x)
         
         # CONV2D (resize) + BN + activation
@@ -111,7 +111,7 @@ class DGMV9_2(DGM):
 
     def output_value_block(self,x):
         value_head = layers.GlobalAveragePooling2D()(x)
-        value_head = layers.Dense(50, kernel_regularizer=self.l2_reg)(value_head)
+        value_head = layers.Dense(146, kernel_regularizer=self.l2_reg)(value_head)
         #value_head = self.bn_activation(value_head)
         value_head = self.activation(value_head)
         value_head = layers.BatchNormalization()(value_head)
