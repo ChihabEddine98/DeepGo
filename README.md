@@ -3,7 +3,7 @@
 Several two headed neural networks with ~ less 1M parameters that performs a pretty good on Go game , trained on 1M games dataset from the KataGo dataset.
 I have used the   [Grid5000](https://www.grid5000.fr) clusters and trained my models using **8x Nvidia Tesla V100 (32 GiB)** GPU's and **512GB** of RAM.
 
-## Getting Started
+## Getting Started 🛠
 Create the docker container ( Python(3.9) + TF(2.7.0) )
 > **Lunch:**   docker build -t deep-go -f Dockerfile .
 
@@ -20,7 +20,7 @@ Or more simply you can use the following
 
 **Note.** If you are using an AMD GPU you can switch the deploy file and use the second one !  
 
-## Train your own models 
+## Train your own models 🏋️‍♂️
 Actually i managed to make it easier for any one using this project to build and train his own model , first just you need to specify your architecture by creating a new folder inside [./src/models](https://github.com/ChihabEddine98/DeepGo/tree/main/src/models) and **``DGVx``** for example and then you can specify your model body (input and outputs blocks are already fine 😁) .
 Then you can change the **``self.name``** for your version so you could have some pretty logs , and then you are all ready to go ! use the following command to run and train your powerful model ! 
 ```python
@@ -55,7 +55,7 @@ Here are the details for options that you can use for training :
 
 **Note .** Logs are made with the beautiful library [**``rich``**](https://github.com/Textualize/rich) in order to get more readable results.
 
-## Why not some charts ?
+## Why not some charts ? 📊
 Yes ! you can do it u simply need to recover the history of your models which is done automatically through the earlier command for training then you can simply call the [./src/utils](https://github.com/ChihabEddine98/DeepGo/blob/main/src/utils.py) function : 
 ```python
 def train_plots(epochs,histories,styles)
