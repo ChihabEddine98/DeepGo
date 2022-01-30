@@ -33,8 +33,8 @@ echo 'Configuring Repository[DeepGo]...'
 git config --global --replace-all user.email "ga_benamara@esi.dz"
 git config --global user.username "ChihabEddine98"
 git config --list
-# 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
-git clone https://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@github.com/ChihabEddine98/DeepGo.git
+
+git clone https://github.com/ChihabEddine98/DeepGo.git
 cd DeepGo
 pip3 install --ignore-installed -r requirements.txt
 cd src
