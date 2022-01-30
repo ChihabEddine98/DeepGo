@@ -65,5 +65,10 @@ def train_plots(epochs,histories,styles)
 -- styles can be of the format (color-style)
    Ex. mo means magenta and dots ...
 ```
+## Further Details
+
 For more details and examples on how to use this charts see [./src/train_dgm.ipynb](https://github.com/ChihabEddine98/DeepGo/blob/main/src/train_dgm.ipynb)
-And to see my results you can take a look on my [paper.pdf](https://github.com/ChihabEddine98/DeepGo/blob/main/report.pdf).
+And to see my results during the training and testing of my models you can take a look on my paper **[DeepGo]** via this [link](https://github.com/ChihabEddine98/DeepGo/blob/main/report.pdf).
+
+## Contibute 
+If you encountered a problem or want to contibute , don't hesitate to open an issue and/or reach out on LinkedIn : [Chihab Benamara](https://www.linkedin.com/in/chihab-eddine-benamara-65b811155/)
