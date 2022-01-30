@@ -13,7 +13,7 @@ echo 'Configuring Repository[DeepGo]...'
 git config --global --replace-all user.email "ga_benamara@esi.dz"
 git config --global user.username "ChihabEddine98"
 git config --list
-git clone https://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@github.com/ChihabEddine98/DeepGo.git
+git clone https://github.com/ChihabEddine98/DeepGo.git
 pip3 install rich pybind11
 cd DeepGo/src
 c++ -O3 -Wall -shared -std=c++11 -fsized-deallocation -fPIC `python3 -m pybind11 --includes` golois/golois.cpp -o golois$(python3-config --extension-suffix)
