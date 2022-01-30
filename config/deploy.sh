@@ -132,7 +132,7 @@ wget https://www.lamsade.dauphine.fr/~cazenave/games.1000000.data.zip
 git config --global --replace-all user.email "ga_benamara@esi.dz"
 git config --global user.username "ChihabEddine98"
 git config --list
-git clone https://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@github.com/ChihabEddine98/DeepGo.git
+git clone https://github.com/ChihabEddine98/DeepGo.git
 cd DeepGo
 pip3 install --ignore-installed -r requirements.txt
 cd src
