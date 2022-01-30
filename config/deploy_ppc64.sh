@@ -12,7 +12,7 @@ conda config --prepend channels https://public.dhe.ibm.com/ibmdl/export/pub/soft
 conda install tensorflow-gpu pybind11 ricb
 
 
-git clone https://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@github.com/ChihabEddine98/DeepGo.git
+git clone https://github.com/ChihabEddine98/DeepGo.git
 cd DeepGo/src
 c++ -O3 -Wall -shared -std=c++11 -fsized-deallocation -fPIC `python3 -m pybind11 --includes` golois/golois.cpp -o golois$(python3-config --extension-suffix)
 echo 'Getting Games from [LAMSADE]...'
