@@ -2,6 +2,7 @@
 **Author .**  [Abdelkader Chihab Benamara](https://github.com/ChihabEddine98/) 
 Several two headed neural networks with ~ less 1M parameters that performs pretty good on Go game , trained on 1M games dataset from the KataGo dataset.
 I have used the [Grid5000](https://www.grid5000.fr) clusters and trained my models using **8x Nvidia Tesla V100 (32 GiB)** GPU's and **512GB** of RAM.
+And my current best model has **``57.75%``** validation accuracy on policy head.
 
 ## Getting Started 🛠
 Create the docker container ( Python(3.9) + TF(2.7.0) )
@@ -22,7 +23,9 @@ Or more simply you can use the following
 
 ## Train your own models 🏋️‍♂️
 Actually i managed to make it easier for any one using this project to build and train his own model , first just you need to specify your architecture by creating a new folder inside [./src/models](https://github.com/ChihabEddine98/DeepGo/tree/main/src/models) and **``DGVx``** for example and then you can specify your model body (input and outputs blocks are already fine 😁) .
-Then you can change the **``self.name``** for your version so you could have some pretty logs , and then you are all ready to go ! use the following command to run and train your powerful model ! 
+Then you can change the **``self.name``** for your version so you could have some pretty logs , and then you are all ready to go.
+Use the following command to run and train your powerful model !
+
 ```python
    python?3 ./path_to_train.py -gpu 8 -s 1 -e 2000 -b 1024
 ```
