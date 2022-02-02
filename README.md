@@ -1,6 +1,6 @@
 # DeepGO (DGM) 🤖
 **Author .**  [Abdelkader Chihab Benamara](https://github.com/ChihabEddine98/) 
-Several two headed neural networks with ~ less 1M parameters that performs pretty good on Go game , trained on 1M games dataset from the KataGo dataset.
+Several two headed neural networks with ~ less **1M** parameters that performs pretty good on Go game , trained on 1M games dataset from the KataGo dataset.
 I have used the [Grid5000](https://www.grid5000.fr) clusters and trained my models using **8x Nvidia Tesla V100 (32 GiB)** GPU's and **512GB** of RAM.
 And my current best model has **``57.75%``** validation accuracy for the policy head.
 
