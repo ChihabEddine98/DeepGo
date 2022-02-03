@@ -33,7 +33,7 @@ This command train the model **``DGVx``** on **8** GPU's for **2000** epochs and
 Here are the details for options that you can use for training : 
 ```python
 ---------------------------------------------------------------
-				Command Line Guide (args to use)
+	Command Line Guide (args to use)
 ---------------------------------------------------------------
 -h [–-help]	          :  help with command line
 -gpu [–-num-gpu]      :  \# of GPUs to be used 
