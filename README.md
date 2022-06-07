@@ -72,3 +72,7 @@ And to see my results during the training and testing of my models you can take 
 
 ## Contibute 
 If you encountered a problem or want to contibute , don't hesitate to open an issue and/or reach out on LinkedIn : [Chihab Benamara](https://www.linkedin.com/in/chihab-eddine-benamara-65b811155/)
+
+
+## TODO -- 
+- [ ] implement chess version (stockfish like)
