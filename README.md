@@ -75,4 +75,4 @@ If you encountered a problem or want to contibute , don't hesitate to open an is
 
 
 ## TODO -- 
-- [ ] implement chess version (stockfish like)
+- [ ] implement chess version (stockfish's nnue)
